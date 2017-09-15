@@ -1,0 +1,506 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+          "http://www.w3.org/TR/html40/loose.dtd">
+
+<html>
+         
+  <head>
+    <title>Module: em</title>
+  </head>
+
+  <body bgcolor="#ffffff">
+
+        <p><i><a href="../../../../../index.html">Table of Contents</a></i></p>
+        
+        <table border="0" cellpadding="5" cellspacing="0" width="100%">
+        <tr>
+            <th rowspan="2"
+                valign="top"
+                align="left"
+                width="10%"
+                bgcolor="#88bbee"><font color="#000000">Module: em</font>
+            </th>
+            <th bgcolor="#88bbee"
+                width="90%"
+                align="right"><font color="#000000">em.py</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+<p>A system for processing Python as markup embedded in text.</p>
+<table border="0" cellpadding="5" cellspacing="0" width="100%">
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="Imported modules">Imported modules</a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+<b>import</b> <a href="http://www.python.org/doc/current/lib/module-copy.html">copy</a><br>
+<b>import</b> <a href="http://www.python.org/doc/current/lib/module-getopt.html">getopt</a><br>
+<b>import</b> <a href="http://www.python.org/doc/current/lib/module-os.html">os</a><br>
+<b>import</b> <a href="http://www.python.org/doc/current/lib/module-re.html">re</a><br>
+<b>import</b> <a href="http://www.python.org/doc/current/lib/module-string.html">string</a><br>
+<b>import</b> <a href="http://www.python.org/doc/current/lib/module-sys.html">sys</a><br>
+<b>import</b> <a href="http://www.python.org/doc/current/lib/module-types.html">types</a><br>
+
+</td></tr>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="Functions">Functions</a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+<a href="#environment">environment</a><br>
+<a href="#expand">expand</a><br>
+<a href="#info">info</a><br>
+<a href="#invoke">invoke</a><br>
+<a href="#main">main</a><br>
+<a href="#usage">usage</a><br>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="environment"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">environment&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+environment ( name,  default=None )
+
+</pre></font>
+
+<p>Get data from the current environment.  If the default is True
+    or False, then presume that we're only interested in the existence
+    or non-existence of the environment variable.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="expand"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">expand&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+expand (
+        _data,
+        _globals=None,
+        _argv=None,
+        _prefix=DEFAULT_PREFIX,
+        _pseudo=None,
+        _options=None,
+        **_locals,
+        )
+
+</pre></font>
+
+<p>Do an atomic expansion of the given source data, creating and
+    shutting down an interpreter dedicated to the task.  The sys.stdout
+    object is saved off and then replaced before this function
+    returns.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="info"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">info&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+info ( table )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="invoke"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">invoke&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+invoke ( args )
+
+</pre></font>
+
+<p>Run a standalone instance of an EmPy interpeter.</p>
+<table border="0" cellpadding="5" cellspacing="0" width="100%">
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="Exceptions">Exceptions</a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+Error, "prefix must be single-character string"<br>
+ValueError, "-b only makes sense with -o or -a arguments"<br>
+
+</td></tr>
+</table>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="main"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">main&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+main ()
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="usage"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">usage&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+usage ( verbose=True )
+
+</pre></font>
+
+<p>Print usage information.</p>
+</td></tr>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="Classes">Classes</a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+<table border="0" cellpadding="3" cellspacing="0">
+<tr><td valign="top" align="left"><p><a href="em/AbstractFile.html">AbstractFile</a></p></td><td valign="top" align="left">
+<p>An abstracted file that, when buffered, will totally buffer the</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/BreakFlow.html">BreakFlow</a></p></td><td valign="top" align="left">
+<p>A break control flow.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/BufferedFilter.html">BufferedFilter</a></p></td><td valign="top" align="left">
+<p>A buffered filter is one that doesn't modify the source data</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/CommentToken.html">CommentToken</a></p></td><td valign="top" align="left">
+<p>A comment markup.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/Context.html">Context</a></p></td><td valign="top" align="left">
+<p>An interpreter context, which encapsulates a name, an input</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/ContextLineToken.html">ContextLineToken</a></p></td><td valign="top" align="left">
+<p>A context line change markup.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/ContextNameToken.html">ContextNameToken</a></p></td><td valign="top" align="left">
+<p>A context name change markup.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/ContinueFlow.html">ContinueFlow</a></p></td><td valign="top" align="left">
+<p>A continue control flow.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/ControlToken.html">ControlToken</a></p></td><td valign="top" align="left">
+<p>A control token.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/CustomToken.html">CustomToken</a></p></td><td valign="top" align="left">
+<p>A custom markup.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/Diversion.html">Diversion</a></p></td><td valign="top" align="left">
+<p>The representation of an active diversion.  Diversions act as</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/DiversionError.html">DiversionError</a></p></td><td valign="top" align="left">
+<p>An error related to diversions.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/Document.html">Document</a></p></td><td valign="top" align="left">
+<p>A representation of an individual EmPy document, as used by a</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/Error.html">Error</a></p></td><td valign="top" align="left">
+<p>The base class for all EmPy errors.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/EscapeToken.html">EscapeToken</a></p></td><td valign="top" align="left">
+<p>An escape markup.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/ExpansionToken.html">ExpansionToken</a></p></td><td valign="top" align="left">
+<p>A token that involves an expansion.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/ExpressionToken.html">ExpressionToken</a></p></td><td valign="top" align="left">
+<p>An expression markup.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/Filter.html">Filter</a></p></td><td valign="top" align="left">
+<p>An abstract filter.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/FilterError.html">FilterError</a></p></td><td valign="top" align="left">
+<p>An error related to filters.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/FlowError.html">FlowError</a></p></td><td valign="top" align="left">
+<p>An exception related to control flow.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/FunctionFilter.html">FunctionFilter</a></p></td><td valign="top" align="left">
+<p>A filter that works simply by pumping its input through a</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/Hook.html">Hook</a></p></td><td valign="top" align="left">
+<p>The base class for implementing hooks.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/InPlaceToken.html">InPlaceToken</a></p></td><td valign="top" align="left">
+<p>An in-place markup.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/Interpreter.html">Interpreter</a></p></td><td valign="top" align="left">
+<p>An interpreter can process chunks of EmPy code.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/LineBufferedFilter.html">LineBufferedFilter</a></p></td><td valign="top" align="left">
+<p>A line-buffered filter only lets data through when it sees</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/LiteralToken.html">LiteralToken</a></p></td><td valign="top" align="left">
+<p>A literal markup.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/MaximallyBufferedFilter.html">MaximallyBufferedFilter</a></p></td><td valign="top" align="left">
+<p>A maximally-buffered filter only lets its data through on the final</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/MetaError.html">MetaError</a></p></td><td valign="top" align="left">
+<p>A wrapper around a real Python exception for including a copy of</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/NullFile.html">NullFile</a></p></td><td valign="top" align="left">
+<p>A simple class that supports all the file-like object methods</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/NullFilter.html">NullFilter</a></p></td><td valign="top" align="left">
+<p>A filter that never sends any output to its sink.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/NullToken.html">NullToken</a></p></td><td valign="top" align="left">
+<p>A chunk of data not containing markups.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/ParseError.html">ParseError</a></p></td><td valign="top" align="left">
+<p>A parse error occurred.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/PrefixToken.html">PrefixToken</a></p></td><td valign="top" align="left">
+<p>A prefix markup.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/Processor.html">Processor</a></p></td><td valign="top" align="left">
+<p>An entity which is capable of processing a hierarchy of EmPy</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/ProxyFile.html">ProxyFile</a></p></td><td valign="top" align="left">
+<p>The proxy file object that is intended to take the place of</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/ReprToken.html">ReprToken</a></p></td><td valign="top" align="left">
+<p>A repr markup.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/Scanner.html">Scanner</a></p></td><td valign="top" align="left">
+<p>A scanner holds a buffer for lookahead parsing and has the</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/SignificatorToken.html">SignificatorToken</a></p></td><td valign="top" align="left">
+<p>A significator markup.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/SimpleExpressionToken.html">SimpleExpressionToken</a></p></td><td valign="top" align="left">
+<p>A simple expression markup.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/SizeBufferedFilter.html">SizeBufferedFilter</a></p></td><td valign="top" align="left">
+<p>A size-buffered filter only in fixed size chunks (excepting the</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/Stack.html">Stack</a></p></td><td valign="top" align="left">
+<p>A simple stack that behaves as a sequence (with 0 being the top</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/StackUnderflowError.html">StackUnderflowError</a></p></td><td valign="top" align="left">
+<p>A stack underflow.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/StatementToken.html">StatementToken</a></p></td><td valign="top" align="left">
+<p>A statement markup.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/Stream.html">Stream</a></p></td><td valign="top" align="left">
+<p>A wrapper around an (output) file object which supports</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/StringFilter.html">StringFilter</a></p></td><td valign="top" align="left">
+<p>A filter that takes a translation string (256 characters) and</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/StringLiteralToken.html">StringLiteralToken</a></p></td><td valign="top" align="left">
+<p>A string token markup.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/Subsystem.html">Subsystem</a></p></td><td valign="top" align="left">
+<p>The subsystem class defers file creation so that it can create</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/SubsystemError.html">SubsystemError</a></p></td><td valign="top" align="left">
+<p>An error associated with the Unicode subsystem.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/Token.html">Token</a></p></td><td valign="top" align="left">
+<p>An element of expansion.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/TransientParseError.html">TransientParseError</a></p></td><td valign="top" align="left">
+<p>A parse error occurred which may be resolved by feeding more data.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/UncloseableFile.html">UncloseableFile</a></p></td><td valign="top" align="left">
+<p>A simple class which wraps around a delegate file-like object</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/VerboseHook.html">VerboseHook</a></p></td><td valign="top" align="left">
+<p>A verbose hook that reports all information received by the</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="em/WhitespaceToken.html">WhitespaceToken</a></p></td><td valign="top" align="left">
+<p>A whitespace markup.</p>
+</td></tr>
+</table>
+</td></tr>
+</td></tr>
+</table>
+
+        </td>
+        </tr>
+        </table>
+
+        <hr>
+
+        <p><i><a href="../../../../../index.html">Table of Contents</a></i></p>
+
+        <font size="-2"><i>This document was automatically generated
+        on Mon Oct 27 01:29:13 2003 by
+        <a href="http://happydoc.sourceforge.net">HappyDoc</a> version
+        2.1</i></font>
+        
+        </body>
+        </html>
+        

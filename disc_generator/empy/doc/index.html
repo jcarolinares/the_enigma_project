@@ -1,0 +1,2247 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+          "http://www.w3.org/TR/html40/loose.dtd">
+
+<html>
+         
+  <head>
+    <title>empy</title>
+  </head>
+
+  <body bgcolor="#ffffff">
+
+        <p><i><a href="index.html">Table of Contents</a></i></p>
+        
+        <table border="0" cellpadding="5" cellspacing="0" width="100%">
+        <tr>
+            <th rowspan="2"
+                valign="top"
+                align="left"
+                width="10%"
+                bgcolor="#88bbee"><font color="#000000">empy</font>
+            </th>
+            <th bgcolor="#88bbee"
+                width="90%"
+                align="right"><font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+<h3>Summary</h3>
+<p>    A powerful and robust templating system for Python.</p>
+<h3>Overview</h3>
+<p>    EmPy is a system for embedding Python expressions and statements
+    in template text; it takes an EmPy source file, processes it, and
+    produces output.  This is accomplished via expansions, which are
+    special signals to the EmPy system and are set off by a special
+    prefix (by default the at sign, <code>@</code>).  EmPy can expand arbitrary
+    Python expressions and statements in this way, as well as a
+    variety of special forms.  Textual data not explicitly delimited
+    in this way is sent unaffected to the output, allowing Python to
+    be used in effect as a markup language.  Also supported are
+    callbacks via hooks, recording and playback via diversions, and
+    dynamic, chainable filters.  The system is highly configurable via
+    command line options and embedded commands.</p>
+<p>    Expressions are embedded in text with the <code>@(...)</code> notation;
+    variations include conditional expressions with <code>@(...?...!...)</code>
+    and the ability to handle thrown exceptions with <code>@(...$...)</code>.  As
+    a shortcut, simple variables and expressions can be abbreviated as
+    <code>@variable</code>, <code>@object.attribute</code>, <code>@function(arguments)</code>,
+    <code>@sequence</code> <a href="#index"><a href="#refindex">[index]</a></a>, and combinations.  Full-fledged statements
+    are embedded with <code>@{...}</code>.  Control flow in terms of conditional
+    or repeated expansion is available with <code>@[...]</code>.  A <code>@</code> followed
+    by a whitespace character (including a newline) expands to
+    nothing, allowing string concatenations and line continuations.
+    Comments are indicated with <code>@#</code> and consume the rest of the line,
+    up to and including the trailing newline.  <code>@%</code> indicate
+    "significators," which are special forms of variable assignment
+    intended to specify per-file identification information in a
+    format which is easy to parse externally.  Context name and line
+    number changes can be done with <code>@?</code> and <code>@!</code> respectively.
+    '@<...>' markups are customizeable by the user and can be used for
+    any desired purpose.  Escape sequences analogous to those in C can
+    be specified with <code>@\...</code>, and finally a <code>@@</code> sequence expands to
+    a single literal at sign.</p>
+<h3>Getting the software</h3>
+<p>    The current version of empy is 3.3.2.</p>
+<p>    The latest version of the software is available in a tarball here:
+    <a href="http://www.alcyone.com/software/empy/empy-latest.tar.gz">http://www.alcyone.com/software/empy/empy-latest.tar.gz</a>.</p>
+<p>    The official URL for this Web site is
+    <a href="http://www.alcyone.com/software/empy/">http://www.alcyone.com/software/empy/</a>.</p>
+<h3>Requirements</h3>
+<p>    EmPy should work with any version of Python from 2.4 onward,
+    including 3.x.</p>
+<h3>License</h3>
+<p>    This code is released under the <a href="http://www.gnu.org/copyleft/lesser.html">LGPL</a>.</p>
+<h3>Mailing lists</h3>
+<p>    There are two EmPy related mailing lists available.  The first is
+    a receive-only, very low volume list for important announcements
+    (including releases).  To subscribe, send an email to
+    <a href="mailto:empy-announce-list-subscribe@alcyone.com">empy-announce-list-subscribe@alcyone.com</a>.</p>
+<p>    The second is a general discussion list for topics related to
+    EmPy, and is open for everyone to contribute; announcements
+    related to EmPy will also be made on this list.  The author of
+    EmPy (and any future developers) will also be on the list, so it
+    can be used not only to discuss EmPy features with other users,
+    but also to ask questions of the author(s).  To subscribe, send an
+    email to <a href="mailto:empy-list-subscribe@alcyone.com">empy-list-subscribe@alcyone.com</a>.</p>
+<h3>Basics</h3>
+<p>    EmPy is intended for embedding Python code in otherwise
+    unprocessed text.  Source files are processed, and the results are
+    written to an output file.  Normal text is sent to the output
+    unchanged, but markups are processed, expanded to their results,
+    and then written to the output file as strings (that is, with the
+    <code>str</code> function, not <code>repr</code>).  The act of processing EmPy source
+    and handling markups is called "expansion."</p>
+<p>    Code that is processed is executed exactly as if it were entered
+    into the Python interpreter; that is, it is executed with the
+    equivalent of <code>eval</code> (for expressions) and <code>exec</code> (for
+    statements).  EmPy is intended to be a very thin (though powerful)
+    layer on top of a running Python system; Python and EmPy files can
+    be mixed together (via command line options) without
+    complications.</p>
+<p>    By default the embedding prefix is the at sign (<code>@</code>), which
+    appears neither in valid Python code nor commonly in arbitrary
+    texts; it can be overridden with the -p option (or with the
+    <code>empy.setPrefix</code> function).  The prefix indicates to the EmPy
+    interpreter that a special sequence follows and should be
+    processed rather than sent to the output untouched (to indicate a
+    literal at sign, it can be doubled as in <code>@@</code>).</p>
+<p>    When the interpreter starts processing its target file, no modules
+    are imported by default, save the <code>empy</code> pseudomodule (see below),
+    which is placed in the globals; the <code>empy</code> pseudomodule is
+    associated with a particular interpreter -- in fact, they are the
+    same object -- and it is important that it not be removed from
+    that interpreter's globals, nor that it be shared with other
+    interpreters running concurrently (a name other than <code>empy</code> can be
+    specified with the -m option).  The globals are not cleared or
+    reset in any way.  It is perfectly legal to set variables or
+    explicitly import modules and then use them in later markups,
+    <em>e.g.</em>, <code>@{import time} ... @time.time()</code>.  Scoping rules are as
+    in normal Python, although all defined variables and objects are
+    taken to be in the global namespace.</p>
+<p>    Indentation is significant in Python, and therefore is also
+    significant in EmPy.  EmPy statement markups (<code>@{...}</code>), when
+    spanning multiple lines, must be flush with the left margin.  This
+    is because (multiline) statement markups are not treated specially
+    in EmPy and are simply passed to the Python interpreter, where
+    indentation is significant.</p>
+<p>    Activities you would like to be done before any processing of the
+    main EmPy file can be specified with the -I, -D, -E, -F, and -P
+    options.  -I imports modules, -D executes a Python variable
+    assignment, -E executes an arbitrary Python (not EmPy) statement,
+    -F executes a Python (not EmPy) file, and -P processes an EmPy
+    (not Python) file.  These operations are done in the order they
+    appear on the command line; any number of each (including, of
+    course, zero) can be used.</p>
+<h3>Expansions</h3>
+<p>    The following markups are supported.  For concreteness below, <code>@</code>
+    is taken for the sake of argument to be the prefix character,
+    although this can be changed.</p>
+<dl>
+<dt>    <strong><code>@# COMMENT NEWLINE</code></strong></dt>
+<dd>A comment.  Comments, including the
+      trailing newline, are stripped out completely.  Comments should
+      only be present outside of expansions.  The comment itself is
+      not processed in any way: It is completely discarded.  This
+      allows <code>@#</code> comments to be used to disable markups.  <em>Note:</em> As
+      special support for "bangpaths" in Unix-like operating systems,
+      if the first line of a file (or indeed any context) begins with
+      <code>#!</code>, and the interpreter has a <code>processBangpaths</code> option set to
+      true (default), it is treated as a <code>@#</code> comment.  A <code>#!</code>
+      sequence appearing anywhere else will be handled literally and
+      unaltered in the expansion.  Example:
+<pre>
+          @# This line is a comment.
+          @# This will NOT be expanded: @x.
+</pre>
+</dd>
+<dt>    <strong><code>@? NAME NEWLINE</code></strong></dt>
+<dd>Set the name of the current context to be
+      the given string.  Variables are not allowed here; the name is
+      treated as a literal.  (If you wish to use arbitrary
+      expressions, use the <code>empy.setContextName</code> function instead.)
+      Example:
+<pre>
+          @?NewName
+          The context name is now @empy.identify()[0] (NewName).
+</pre>
+</dd>
+<dt>    <strong><code>@! INTEGER NEWLINE</code></strong></dt>
+<dd>Set the line number of the current
+      context to be the given integer value; this is similar to the
+      <code>#line</code> C preprocessor directive.  This is done in such a way
+      that the <em>next</em> line will have the specified numeric value, not
+      the current one.  Expressions are not allowed here; the number
+      must be a literal integer.  (If you wish to use arbitrary
+      expressions, use the <code>empy.setContextLine</code> function instead.)
+      Example:
+<pre>
+          @!100
+          The context line is now @empy.identify()[1] (100).
+</pre>
+</dd>
+<dt>    <strong><code>@ WHITESPACE</code></strong></dt>
+<dd>A <code>@</code> followed by one whitespace character
+      (a space, horizontal tab, vertical tab, carriage return, or
+      newline) is expanded to nothing; it serves as a way to
+      explicitly separate two elements which might otherwise be
+      interpreted as being the same symbol (such as <code>@name@ s</code> to mean
+      <code>@(name)s</code> -- see below).  Also, since a newline qualifies as
+      whitespace here, the lone <code>@</code> at the end of a line represents a
+      line continuation, similar to the backslash in other languages.
+      Coupled with statement expansion below, spurious newlines can be
+      eliminated in statement expansions by use of the <code>@{...}@</code>
+      construct.  Example:
+<pre>
+          This will appear as one word: salt@ water.
+          This is a line continuation; @
+          this text will appear on the same line.
+</pre>
+</dd>
+<dt>    <strong><code>@\ ESCAPE_CODE</code></strong></dt>
+<dd>An escape code.  Escape codes in EmPy are
+      similar to C-style escape codes, although they all begin with
+      the prefix character.  Valid escape codes include:<dl>
+<dt>          <code>@\0</code></dt>
+<dd>NUL, null</dd>
+<dt>          <code>@\a</code></dt>
+<dd>BEL, bell</dd>
+<dt>          <code>@\b</code></dt>
+<dd>BS, backspace</dd>
+<dt>          <code>@\d</code></dt>
+<dd>three-digital decimal code DDD</dd>
+<dt>          <code>@\e</code></dt>
+<dd>ESC, escape</dd>
+<dt>          <code>@\f</code></dt>
+<dd>FF, form feed</dd>
+<dt>          <code>@\h</code></dt>
+<dd>DEL, delete</dd>
+<dt>          <code>@\n</code></dt>
+<dd>LF, linefeed character, newline</dd>
+<dt>          <code>@\oOOO</code></dt>
+<dd>three-digit octal code OOO</dd>
+<dt>          <code>@\qQQQQ</code></dt>
+<dd>four-digit quaternary code QQQQ</dd>
+<dt>          <code>@\r</code></dt>
+<dd>CR, carriage return</dd>
+<dt>          <code>@\s</code></dt>
+<dd>SP, space</dd>
+<dt>          <code>@\t</code></dt>
+<dd>HT, horizontal tab</dd>
+<dt>          <code>@\v</code></dt>
+<dd>VT, vertical tab</dd>
+<dt>          <code>@\xHH</code></dt>
+<dd>two-digit hexadecimal code HH</dd>
+<dt>          <code>@\z</code></dt>
+<dd>EOT, end of transmission</dd>
+<dt>          <code>@^X</code></dt>
+<dd>the control character ^X</dd>
+</dl>
+<p>      Unlike in C-style escape codes, escape codes taking some number
+      of digits afterward always take the same number to prevent
+      ambiguities.  Furthermore, unknown escape codes are treated as
+      parse errors to discourage potential subtle mistakes.  Note
+      that, while <code>@\0</code> represents the NUL character, to represent an
+      octal code, one must use <code>@\o...</code>, in contrast to C.  Example:
+<pre>
+          This embeds a newline.@\nThis is on the following line.
+          This beeps!@\a
+          There is a tab here:@\tSee?
+          This is the character with octal code 141: @\o141.
+</pre>
+</p>
+</dd>
+<dt>    <strong><code>@@</code></strong></dt>
+<dd>A literal at sign (<code>@</code>).  To embed two adjacent at
+      signs, use <code>@@@@</code>, and so on.  Any literal at sign that you wish
+      to appear in your text must be written this way, so that it will
+      not be processed by the system.  <em>Note:</em> If a prefix other than
+      <code>@</code> has been chosen via the command line option, one expresses
+      that literal prefix by doubling it, not by appending a <code>@</code>.
+      Example:
+<pre>
+          The prefix character is @@.
+          To get the expansion of x you would write @@x.
+</pre>
+</dd>
+<dt>    <strong><code>@)</code>, <code>@]</code>, <code>@}</code></strong></dt>
+<dd>These expand to literal close parentheses,
+      close brackets, and close braces, respectively; these are
+      included for completeness and explicitness only.  Example:
+<pre>
+          This is a close parenthesis: @).
+</pre>
+</dd>
+<dt>    <strong><code>@"..."</code>, <code>@"""..."""</code>, etc.</strong></dt>
+<dd>These string literals expand
+      to the literals themselves, so <code>@"test"</code> expands to <code>test</code>.
+      Since they are inherently no-operations, the only reason for
+      their use is to override their behavior with hooks.</dd>
+<dt>    <strong><code>@( EXPRESSION )</code></strong></dt>
+<dd>Evaluate an expression, and expand with
+      the string (via a call to <code>str</code>) representation evaluation of
+      that expression.  Whitespace immediately inside the parentheses
+      is ignored; <code>@( expression )</code> is equivalent to <code>@(expression)</code>.
+      If the expression evaluates to <code>None</code>, nothing is expanded in
+      its place; this allows function calls that depend on side
+      effects (such as printing) to be called as expressions.  (If you
+      really <em>do</em> want a <code>None</code> to appear in the output, then use the
+      Python string <code>"None"</code>.)  <em>Note:</em> If an expression prints
+      something to <code>sys.stdout</code> as a side effect, then that printing
+      will be spooled to the output <em>before</em> the expression's return
+      value is.  Example:
+<pre>
+          2 + 2 is @(2 + 2).
+          4 squared is @(4**2).
+          The value of the variable x is @(x).
+          This will be blank: @(None).
+</pre>
+</dd>
+<dt>    <strong><code>@( TEST ? THEN (! ELSE)_opt ($ EXCEPT)_opt )</code></strong></dt>
+<dd>A special
+      form of expression evaluation representing conditional and
+      protected evaluation.  Evaluate the "test" expression; if it
+      evaluates to true (in the Pythonic sense), then evaluate the
+      "then" section as an expression and expand with the <code>str</code> of
+      that result.  If false, then the "else" section is evaluated and
+      similarly expanded.  The "else" section is optional and, if
+      omitted, is equivalent to <code>None</code> (that is, no expansion will
+      take place).  <em>Note</em>: For backward compatibility, the "else"
+      section delimiter, <code>!</code>, may be expressed as a <code>:</code>.  This
+      behavior is supported but deprecated.<p>      If the "except" section is present, then if any of the prior
+      expressions raises an exception when evaluated, the expansion
+      will be replaced with the evaluation of the except expression.
+      (If the "except" expression itself raises, then that exception
+      will be propagated normally.)  The except section is optional
+      and, if omitted, is equivalent to <code>None</code> (that is, no expansion
+      will take place).  An exception (cough) to this is if one of
+      these first expressions raises a SyntaxError; in that case the
+      protected evaluation lets the error through without evaluating
+      the "except" expression.  The intent of this construct is to
+      except runtime errors, and if there is actually a syntax error
+      in the "try" code, that is a problem that should probably be
+      diagnosed rather than hidden.  Example:
+<pre>
+          What is x? x is @(x ? "true" ! "false").
+          Pluralization: How many words? @x word@(x != 1 ? 's').
+          The value of foo is @(foo $ "undefined").
+          Division by zero is @(x/0 $ "illegal").
+</pre>
+</p>
+</dd>
+<dt>    <strong><code>@ SIMPLE_EXPRESSION</code></strong></dt>
+<dd>As a shortcut for the <code>@(...)</code>
+      notation, the parentheses can be omitted if it is followed by a
+      "simple expression."  A simple expression consists of a name
+      followed by a series of function applications, array
+      subscriptions, or attribute resolutions, with no intervening
+      whitespace.  For example:
+<ul>
+<li><p>a name, possibly with qualifying attributes (<em>e.g.</em>,
+            <code>@value</code>, <code>@os.environ</code>).</p></li>
+<li><p>a straightforward function call (<em>e.g.</em>, <code>@min(2, 3)</code>,
+            <code>@time.ctime()</code>), with no space between the function name
+            and the open parenthesis.</p></li>
+<li><p>an array subscription (<em>e.g.</em>, '@array<a href="#refindex">[index]</a>',
+            '@os.environ<a href="#refname">[name]</a>', with no space between the name and
+            the open bracket.</p></li>
+<li><p>any combination of the above (<em>e.g.</em>,
+            '@function(args).attr<a href="#refsub">[sub]</a>.other<a href="#refi">[i]</a>(foo)').</p></li>
+
+</ul>
+<p>      In essence, simple expressions are expressions that can be
+      written ambiguously from text, without intervening space.  Note
+      that trailing dots are not considered part of the expansion
+      (<em>e.g.</em>, <code>@x.</code> is equivalent to <code>@(x).</code>, not <code>@(x.)</code>, which
+      would be illegal anyway).  Also, whitespace is allowed within
+      parentheses or brackets since it is unambiguous, but not between
+      identifiers and parentheses, brackets, or dots.  Explicit
+      <code>@(...)</code> notation can be used instead of the abbreviation when
+      concatenation is what one really wants (<em>e.g.</em>, <code>@(word)s</code> for
+      simple pluralization of the contents of the variable <code>word</code>).
+      As above, if the expression evaluates to the <code>None</code> object,
+      nothing is expanded.  Note that since a curly appearing where
+      EmPy would expect an open parenthesis or bracket in is
+      meaningless in Python, it is treated as a parse error (<em>e.g.</em>,
+      <code>@x{1, 2}</code> results in an error).  Example:
+<pre>
+          The value of x is @x.
+          The ith value of a is @a[i].
+          The result of calling f with q is @f(q).
+          The attribute a of x is @x.a.
+          The current time is @time.ctime(time.time()).
+          The current year is @time.localtime(time.time())[0].
+          These are the same: @min(2,3) and @min(2, 3).
+          But these are not the same: @min(2, 3) vs. @min (2, 3).
+          The plural of @name is @(name)s, or @name@ s.
+</pre>
+</p>
+</dd>
+<dt>    <strong><code>@` EXPRESSION `</code></strong></dt>
+<dd>Evaluate a expression, and expand with
+      the <code>repr</code> (instead of the <code>str</code> which is the default) of the
+      evaluation of that expression.  This expansion is primarily
+      intended for debugging and is unlikely to be useful in actual
+      practice.  That is, a <code>@`...`</code> is identical to <code>@(repr(...))</code>.
+      Example:
+<pre>
+          The repr of the value of x is @`x`.
+          This print the Python repr of a module: @`time`.
+          This actually does print None: @`None`.
+</pre>
+</dd>
+<dt>    <strong><code>@: EXPRESSION : DUMMY :</code></strong></dt>
+<dd>Evaluate an expression and then
+      expand to a <code>@:</code>, the original expression, a <code>:</code>, the evaluation
+      of the expression, and then a <code>:</code>.  The current contents of the
+      dummy area are ignored in the new expansion.  In this sense it
+      is self-evaluating; the syntax is available for use in
+      situations where the same text will be sent through the EmPy
+      processor multiple times.  Example:
+<pre>
+          This construct allows self-evaluation:
+          @:2 + 2:this will get replaced with 4:
+</pre>
+</dd>
+<dt>    <strong><code>@{ STATEMENTS }</code></strong></dt>
+<dd>Execute a (potentially compound)
+      statement; statements have no return value, so the expansion is
+      not replaced with anything.  Multiple statements can either be
+      separated on different lines, or with semicolons; indentation is
+      significant, just as in normal Python code.  Statements,
+      however, can have side effects, including printing; output to
+      <code>sys.stdout</code> (explicitly or via a <code>print</code> statement) is
+      collected by the interpreter and sent to the output (unless this
+      behavior is suppressed with the -n option).  The usual Python
+      indentation rules must be followed, although if the statement
+      consists of only one statement, leading and trailing whitespace
+      is ignored (<em>e.g.</em>, <code>@{ print time.time() }</code> is equivalent to
+      <code>@{print time.time()}</code>).  Example:
+<pre>
+          @{x = 123}
+          @{a = 1; b = 2}
+          @{print time.time()}
+          @# Note that extra newlines will appear above because of the
+          @# newlines trailing the close braces.  To suppress them
+          @# use a @ before the newline:
+          @{
+          for i in range(10):
+              print "i is %d" % i
+          }@
+          @{print "Welcome to EmPy."}@
+</pre>
+</dd>
+<dt>    <strong><code>@% KEY (WHITESPACE VALUE)_opt NEWLINE</code></strong></dt>
+<dd>Declare a
+      significator.  Significators consume the whole line (including
+      the trailing newline), and consist of a key string containing no
+      whitespace, and than optional value prefixed by whitespace.  The
+      key may not start with or contain internal whitespace, but the
+      value may; preceding or following whitespace in the value is
+      stripped.  Significators are totally optional, and are intended
+      to be used for easy external (that is, outside of EmPy)
+      identification when used in large scale environments with many
+      EmPy files to be processed.  The purpose of significators is to
+      provide identification information about each file in a special,
+      easy-to-parse form so that external programs can process the
+      significators and build databases, independently of EmPy.
+      Inside of EmPy, when a significator is encountered, its key,
+      value pair is translated into a simple assignment of the form
+      <code>__KEY__ = VALUE</code> , where "__KEY__" is the key string with two
+      underscores on either side and "VALUE" is a Python expression.
+      Example:
+<pre>
+          @%title     "Gravitation"
+          @%author    "Misner", "Thorne", "Wheeler"
+          @%publisher "W.H. Freeman and Company"
+          @%pages     1279
+          @%keywords  'physics', 'gravity', 'Einstein', 'relativity'
+          @%copyright 1970, 1971
+</pre>
+</dd>
+<dt>    **'@< CONTENTS >'**</dt>
+<dd>Invoke a custom markup.  The custom markup
+      is a special markup reserved for use by the user; it has no
+      prescribed meaning on its own.  If <code>contents</code> is a string
+      representing what appears in between the angle brackets, then
+      expanding this markup is equivalent to
+      <code>empy.invokeCallback(contents)</code>.  See the "Custom markup"
+      section for more information.</dd>
+</dl>
+<h3>Control</h3>
+<p>    EmPy version 3 and above includes the ability to direct
+    conditional and repeated expansion of blocks of EmPy code with
+    control markups (the obsolescent "substitution" markups are
+    unavailable as of version 3.0).  Control markups have analogs to
+    control flow structures in Python such as <code>if/elif/else</code>, <code>for</code>, and
+    <code>while</code>.  Control markups are set off with the <code>@[...]</code> notation.</p>
+<p>    Control markups are designed to be used in precisely the same way
+    that their internal Python analogues are used, except that the
+    control markups are intended to be used where there is much more
+    markup than control structure.</p>
+<p>    Some control markups are considered "primary," (<em>e.g.</em>, <code>if</code>,
+    <code>for</code>, <code>while</code>) as they begin a control markup.  Others are
+    considered "secondary," since they can only appear inside control
+    flow markups delineated by primary markups (<em>e.g.</em>, <code>elif</code>,
+    <code>else</code>, <code>continue</code>, <code>break</code>).</p>
+<p>    Since EmPy, unlike Python, cannot use indentation to determine
+    where control structures begin and end, all primary control
+    markups <em>must</em> be followed by a corresponding terminating control
+    markup:
+<pre>
+        @[PRIMARY ...]...@[end PRIMARY]
+</pre>
+</p>
+<p>    (where <code>PRIMARY</code> represents one of the primary keywords).  The end
+    markup is mandatory, as is the space between the <code>end</code> and the
+    starting keyword.  For instance:
+<pre>
+        @# If `person' is alive, show their age.
+        @person.name is @
+        @[if person.isAlive]@person.age@[else]dead@[end if].
+</pre>
+</p>
+<p>    All primary markups must be terminated in this way, and the
+    keyword appearing in the appropriate <code>end</code> markup must match the
+    primary markup it corresponds to; if either of these conditions
+    are not satisfied, the result is a parse error.  Everything
+    between the starting control flow marker (<code>@[PRIMARY ...]</code>) and
+    the ending marker (<code>@[end PRIMARY]</code>) -- including other markups,
+    even control markups -- is considered part of the markup.  Control
+    markups can be nested:
+<pre>
+        @# Print all non-false elements on separate lines.
+        @[for elem in elements]@[if elem]@elem@\n@[end if]@[end for]
+</pre>
+</p>
+<p>    Three major types of primary control markups are available:
+    conditional (<em>e.g.</em>, <code>if</code>, <code>try</code>), looping (<em>e.g.</em>, <code>for</code>,
+    <code>while</code>), and definitional (<em>e.g.</em>, <code>def</code>, discussed below).
+    Conditional control markups conditionally expand their contents,
+    whereas looping control markups repeatedly expand their contents.
+    The third type, definitional markups, will define new objects in
+    the globals relating to their contents.  Conditional and looping
+    markups also differ in one substantial respect: Looping constructs
+    support '@<a href="#refcontinue">[continue]</a>' and '@<a href="#refbreak">[break]</a>' markups which, like their
+    Python equivalents, continue with the next iteration or break out
+    of the innermost looping construct, respectively ('@<a href="#refcontinue">[continue]</a>'
+    and '@<a href="#refbreak">[break]</a>' markups have no meaning inside conditional markups
+    and are an error).  Also like their Python equivalents,
+    '@<a href="#refcontinue">[continue]</a>' and '@<a href="#refbreak">[break]</a>' may appear inside nested markups, so
+    long as they ultimately are contained by at least one looping
+    control markup:
+<pre>
+        @# Walk a long a linked list, printing each element.
+        @[while 1]@
+        @node
+        @{node = node.next}@
+        @[if not node]@[break]@[end if]@
+        @[end while]
+</pre>
+</p>
+<p>    The provided markups are designed to mimic the internal Python
+    control structures as closely as possible.  The supported control
+    markups are (the phrases in all uppercase are intended to signify
+    user-selectable patterns):
+<pre>
+        @[if CONDITION1]...@[elif CONDITION2]...@[else]...@[end if]
+        @[try]...@[except ...]...@[except ...]...@[end try]
+        @[try]...@[finally]...@[end try]
+        @[for VARIABLE in SEQUENCE]...@[else]...@[end for]
+        @[while CONDITION]...@[else]...@[end while]
+        @[def SIGNATURE]...@[end def]
+</pre>
+</p>
+<p>    All recognizable forms behave like their Python equivalents; <code>if</code>
+    can contain multiple <code>elif</code> secondary markups within it; the
+    <code>else</code> markups are optional (but must appear at the end), the
+    <code>try</code> form with the <code>except</code> clause can contain multiple ones
+    which are handled in sequence, the <code>try</code> form can either contain
+    one or more <code>except</code> clauses or one <code>finally</code> clause (but not
+    both), and the <code>for</code> and <code>while</code> structures can contain <code>continue</code>
+    or <code>break</code> clauses internally (even if contained within other
+    markups).</p>
+<p>    The third type of primary control markup is "definitional," in
+    that they create objects in the globals for later use (<em>e.g.</em>,
+    <code>def</code>).  This allows the definition of a callable object which,
+    when called, will expand the contained markup (which can in turn,
+    of course, contain further markups).  The argument to the markup
+    can be any legal Python function signature:
+<pre>
+        @[def f(x, y, z=2, *args, **keywords)]...@[end def]
+</pre>
+</p>
+<p>    would define a function in the globals named <code>f</code> that takes the
+    given arguments.  A macro markup of the form <code>@[def
+    SIGNATURE]CODE@[end def]</code> is equivalent to the Python code:
+<pre>
+        def SIGNATURE:
+            r"""CODE""" # so it is a doc string
+            empy.expand(r"""CODE""", locals())
+</pre>
+</p>
+<p>    That is, it creates a Python function with the same name and
+    function arguments, whose docstring is the contents of the EmPy
+    markup that will be expanded when called.  And, when called, it
+    will expand those contents, with the locals passed in.</p>
+<h3>Unicode support</h3>
+<p>    EmPy version 3.1 and above includes intrinsic Unicode support.
+    EmPy's Unicode support defers to Python's internal Unicode
+    support, available in Python 2.0 and up, in order to allow
+    seamless and transparent translation of different encodings to the
+    native Python Unicode format.</p>
+<p>    Knowledge of Python's Unicode support is expected, although not
+    completely required, to gain full benefit of EmPy's Unicode
+    features.  To enable Unicode support, start EmPy with the
+    -u/--unicode option.  EmPy will then transparently encode from the
+    input stream, process markups internally with native Unicode, and
+    then decode transparently to the output stream.</p>
+<p>    By default, Python sets <code>sys.stdin</code> and <code>sys.stdout</code> with a
+    default encoding which is accessible via
+    'sys.getdefaultencoding()'; encodings are represented by string
+    names.  These streams have encodings set by the system and
+    <em>cannot</em> be changed.</p>
+<p>    However, encodings for newly created files (files to be read when
+    specified on the command line, and/or files to be written when
+    used with the -o and -a arguments) can be specified for EmPy via
+    command line options.  The --unicode-encoding option
+    simultaneously indicates the encoding to be used for both input
+    and output, whereas the --unicode-input-encoding and
+    --unicode-output-encoding options can each be used to specify
+    different encodings for both input and output.  (If an encoding is
+    not explicitly indicated, it resorts to the system default in
+    <code>sys.getdefaultencoding()</code>, which is locale dependent.)</p>
+<p>    Python's Unicode implementation has the concept of error handlers,
+    registered with the <code>codecs</code> module, which can be specified to
+    determine what action should take place if input cannot be decoded
+    into Unicode, or Unicode cannot be encoded into output.  EmPy uses
+    these same "errors," as they are called, and can be specified via
+    command line options.  The three most common error handlers are:
+    <code>ignore</code>, where invalid sequences are simply ignored; <code>replace</code>,
+    where invalid sequences are replaced with an encoding-specific
+    indicator, usually a question mark; and <code>strict</code>, where invalid
+    sequences raise an error.  The --unicode-errors command line
+    option specifies the same error handler to be used for both input
+    and output, and the --unicode-input-errors and
+    --unicode-output-errors options can specify different error
+    handlers for input and output.  If an error handler is not
+    explicitly specified, the <code>strict</code> handler (which will raise
+    errors) is used.</p>
+<p>    Remember, to specify input encodings or errors that will take
+    effect, one cannot take input from <code>sys.stdin</code> and must explicitly
+    specify an EmPy file to process on the command line.  Similarly,
+    for output encodings or errors, <code>sys.stdout</code> cannot be used and an
+    explicit output file must be specified with the -o or -a options.
+    It is perfectly valid to enable the Unicode subsystem (-u option)
+    while using <code>sys.stdin</code> and <code>sys.stdout</code>, but the encodings and
+    errors of these preexisting streams cannot be changed.</p>
+<p>    Combined with the --no-prefix option, which disables all markup
+    processing, EmPy can act merely as an encoding translator, relying
+    on Python's Unicode facilities:
+<pre>
+        em.py --no-prefix \
+            --unicode-input-encoding=utf-8 \
+            --unicode-output-encoding=latin-1 \
+            -o filename.Latin-1 filename.UTF-8
+</pre>
+</p>
+<h3>Significators</h3>
+<p>    Significators, introduced in EmPy version 1.2, are intended to
+    represent special assignment in a form that is easy to externally
+    parse.  For instance, if one has a system that contains many EmPy
+    files, each of which has its own title, one could use a <code>title</code>
+    significator in each file and use a simple regular expression to
+    find this significator in each file and organize a database of the
+    EmPy files to be built.  This is an easier proposition than, for
+    instance, attempting to grep for a normal Python assignment
+    (inside a <code>@{...}</code> expansion) of the desired variable.</p>
+<p>    Significators look like the following:
+<pre>
+        @%KEY VALUE
+</pre>
+</p>
+<p>    including the trailing newline, where "key" is a name and "value"
+    is a Python expression, and are separated by any whitespace.  This
+    is equivalent to the following Python code:
+<pre>
+        __KEY__ = VALUE
+</pre>
+</p>
+<p>    That is to say, a significator key translates to a Python variable
+    consisting of that key surrounded by double underscores on either
+    side.  The value may contain spaces, but the key may not.  So:
+<pre>
+        @%title "All Roads Lead to Rome"
+</pre>
+</p>
+<p>    translates to the Python code:
+<pre>
+        __title__ = "All Roads Lead to Rome"
+</pre>
+</p>
+<p>    but obviously in a way that easier to detect externally than if
+    this Python code were to appear somewhere in an expansion.  Since
+    significator keys are surrounded by double underscores,
+    significator keys can be any sequence of alphanumeric and
+    underscore characters; choosing <code>123</code> is perfectly valid for a
+    significator (although straight), since it maps to the name
+    <code>__123__</code> which is a legal Python identifier.</p>
+<p>    Note the value can be any Python expression.  The value can be
+    omitted; if missing, it is treated as <code>None</code>.</p>
+<p>    Significators are completely optional; it is completely legal for
+    a EmPy file or files to be processed without containing any
+    significators.  Significators can appear anywhere within a file
+    outside of other markups, but typically they are placed near the
+    top of the file to make them easy to spot and edit by humans.</p>
+<p>    A regular expression string designed to match significators (with
+    the default prefix) is available as <code>empy.SIGNIFICATOR_RE_STRING</code>,
+    and also is a toplevel definition in the <code>em</code> module itself.</p>
+<h3>Diversions</h3>
+<p>    EmPy supports an extended form of diversions, which are a
+    mechanism for deferring and recalling output on demand, similar to
+    the functionality included in m4.  Multiple "streams" of output
+    can be diverted (deferred) and undiverted (recalled) in this
+    manner.  A diversion is identified with a name, which is any
+    immutable object such an integer or string.  When recalled,
+    diverted code is <em>not</em> resent through the EmPy interpreter
+    (although a filter could be set up to do this).</p>
+<p>    By default, no diversions take place.  When no diversion is in
+    effect, processing output goes directly to the specified output
+    file.  This state can be explicitly requested at any time by
+    calling the <code>empy.stopDiverting</code> function.  It is always legal to
+    call this function.</p>
+<p>    When diverted, however, output goes to a deferred location which
+    can then be recalled later.  Output is diverted with the
+    <code>empy.startDiversion</code> function, which takes an argument that is
+    the name of the diversion.  If there is no diversion by that name,
+    a new diversion is created and output will be sent to that
+    diversion; if the diversion already exists, output will be
+    appended to that preexisting diversion.</p>
+<p>    Output send to diversions can be recalled in two ways.  The first
+    is through the <code>empy.playDiversion</code> function, which takes the
+    name of the diversion as an argument.  This recalls the named
+    diversion, sends it to the output, and then erases that
+    diversion.  A variant of this behavior is the
+    <code>empy.replayDiversion</code>, which recalls the named diversion but does
+    not eliminate it afterwards; <code>empy.replayDiversion</code> can be
+    repeatedly called with the same diversion name, and will replay
+    that diversion repeatedly.  <code>empy.createDiversion</code> create a
+    diversion without actually diverting to it, for cases where you
+    want to make sure a diversion exists but do not yet want to send
+    anything to it.</p>
+<p>    The diversion object itself can be retrieved with
+    <code>empy.retrieveDiversion</code>.  Diversions act as writable
+    file-objects, supporting the usual <code>write</code>, <code>writelines</code>, <code>flush</code>,
+    and <code>close</code> methods.  The data that has been diverted to them can
+    be retrieved in one of two ways; either through the <code>asString</code>
+    method, which returns the entire contents of the diversion as a
+    single strong, or through the <code>asFile</code> method, which returns the
+    contents of the diversion as a readable (not writable) file-like
+    object.</p>
+<p>    Diversions can also be explicitly deleted without recalling them
+    with the <code>empy.purgeDiversion</code> function, which takes the desired
+    diversion name as an argument.</p>
+<p>    Additionally there are three functions which will apply the above
+    operations to all existing diversions: <code>empy.playAllDiversions</code>,
+    <code>empy.replayAllDiversions</code>, and <code>empy.purgeAllDiversions</code>.  All
+    three will do the equivalent of a <code>empy.stopDiverting</code> call before
+    they do their thing.</p>
+<p>    The name of the current diversion can be requested with the
+    <code>empy.getCurrentDiversion</code> function; also, the names of all
+    existing diversions (in sorted order) can be retrieved with
+    <code>empy.getAllDiversions</code>.</p>
+<p>    When all processing is finished, the equivalent of a call to
+    <code>empy.playAllDiversions</code> is done.</p>
+<h3>Filters</h3>
+<p>    EmPy also supports dynamic filters, introduced in version 1.3.
+    Filters are put in place right "before" the final output file, and
+    so are only invoked after all other processing has taken place
+    (including interpreting and diverting).  Filters take input, remap
+    it, and then send it to the output.</p>
+<p>    The current filter can be retrieved with the <code>empy.getFilter</code>
+    function.  The filter can be cleared (reset to no filter) with
+    <code>empy.resetFilter</code> and a special "null filter" which does not send
+    any output at all can be installed with <code>empy.nullFilter</code>.  A
+    custom filter can be set with the <code>empy.setFilter</code> function; for
+    convenience, specialized shortcuts for filters preexist and can be
+    used in lieu of actual <code>empy.Filter</code> instances for the
+    <code>empy.setFilter</code> or <code>empy.attachFilter</code> argument:</p>
+
+<ul>
+<li><p><code>None</code> is a special filter meaning "no filter"; when installed,
+      no filtering whatsoever will take place.  <code>empy.setFilter(None)</code>
+      is equivalent to <code>empy.resetFilter()</code>.</p></li>
+<li><p><code>0</code> (or any other numeric constant equal to zero) is another
+      special filter that represents the null filter; when installed,
+      no output will ever be sent to the filter's sink.</p></li>
+<li><p>A filter specified as a function (or lambda) is expected to take
+      one string argument and return one string argument; this filter
+      will execute the function on any input and use the return value
+      as output.</p></li>
+<li><p>A filter that is a string is a 256-character table is
+      substituted with the result of a call to <code>string.translate</code>
+      using that table.</p></li>
+<li><p>A filter can be an instance of a subclass of <code>empy.Filter</code>.
+      This is the most general form of filter.  (In actuality, it can
+      be any object that exhibits a <code>Filter</code> interface, which would
+      include the normal file-like <code>write</code>, <code>flush</code>, and <code>close</code>
+      methods, as well as <code>next</code>, <code>attach</code>, and <code>detach</code> methods for
+      filter-specific behavior.)</p></li>
+<li><p>Finally, the argument to <code>empy.setFilter</code> can be a Python list
+      consisting of one or more of the above objects.  In that case,
+      those filters are chained together in the order they appear in
+      the list.  An empty list is the equivalent of 'None'; all
+      filters will be uninstalled.</p></li>
+
+</ul>
+<p>    Filters are, at their core, simply file-like objects (minimally
+    supporting <code>write</code>, <code>flush</code>, and <code>close</code> methods that behave in
+    the usual way) which, after performing whatever processing they
+    need to do, send their work to the next file-like object or filter
+    in line, called that filter's "sink."  That is to say, filters can
+    be "chained" together; the action of each filter takes place in
+    sequence, with the output of one filter being the input of the
+    next.  Additionally, filters support a <code>_flush</code> method (note the
+    leading underscore) which will always flush the filter's
+    underlying sink; this method should be not overridden.</p>
+<p>    Filters also support three additional methods, not part of the
+    traditional file interface: <code>attach</code>, which takes as an argument a
+    file-like object (perhaps another filter) and sets that as the
+    filter's "sink" -- that is, the next filter/file-like object in
+    line.  <code>detach</code> (which takes no arguments) is another method which
+    flushes the filter and removes its sink, leaving it isolated.
+    Finally, <code>next</code> is an accessor method which returns the filter's
+    sink -- or <code>None</code>, if the filter does not yet have a sink
+    attached.</p>
+<p>    To create your own filter, you can create an object which supports
+    the above described interface, or simply derive from the
+    <code>empy.Filter</code> class and override its <code>write</code> and possibly <code>flush</code>
+    methods.  You can chain filters together by passing them as
+    elements in a list to the <code>empy.setFilter</code> function, or you can
+    chain them together manually with the <code>attach</code> method:
+<pre>
+        firstFilter.attach(secondFilter)
+        empy.setFilter(firstFilter)
+</pre>
+</p>
+<p>    or just let EmPy do the chaining for you:
+<pre>
+        empy.setFilter([firstFilter, secondFilter])
+</pre>
+</p>
+<p>    In either case, EmPy will walk the filter chain and find the end
+    and then hook that into the appropriate interpreter stream; you
+    need not do this manually.  The function <code>empy.attachFilter</code> can
+    be used to attach a single filter (or shortcut, as above) to the
+    end of a currently existing chain.  Note that unlike its cousin
+    <code>empy.setFilter</code>, one cannot pass a sequence of filters (or filter
+    shortcuts) to <code>empy.attachFilter</code>.  (If there is no existing
+    filter chain installed, <code>empy.attachFilter</code> will behave the same
+    as <code>empy.setFilter</code>.)</p>
+<p>    Subclasses of <code>empy.Filter</code> are already provided with the above
+    null, function, and string functionality described above; they are
+    <code>NullFilter</code>, <code>FunctionFilter</code>, and <code>StringFilter</code>, respectively.
+    In addition, a filter which supports buffering, <code>BufferedFilter</code>,
+    is provided.  Several variants are included: <code>SizeBufferedFilter</code>,
+    a filter which buffers into fixed-sized chunks,
+    <code>LineBufferedFilter</code>, a filter which buffers by lines, and
+    <code>MaximallyBufferedFilter</code>, a filter which completely buffers its
+    input.</p>
+<h3>Hooks</h3>
+<p>    The EmPy system allows for the registry of hooks with a running
+    EmPy interpreter.  Originally introduced in version 2.0 and much
+    improved in 3.2, hooks are objects, registered with an
+    interpreter, whose methods represent specific callbacks.  Any
+    number of hook objects can be registered with an interpreter, and
+    when a callback is invoked, the associated method on each one of
+    those hook objects will be called by the interpreter in sequence.</p>
+<p>    Hooks are simply instances, nominally derived from the <code>empy.Hook</code>
+    class.  The <code>empy.Hook</code> class itself defines a series of methods,
+    with the expected arguments, which would be called by a running
+    EmPy interpreter.  This scenario, much improved from the prior
+    implementation in 2.0, allows hooks to keep state and have more
+    direct access to the interpreter they are running in (the
+    <code>empy.Hook</code> instance contains an <code>interpreter</code> attribute).</p>
+<p>    To use a hook, derive a class from <code>empy.Hook</code> and override the
+    desired methods (with the same signatures as they appear in the
+    base class).  Create an instance of that subclass, and then
+    register it with a running interpreter with the <code>empy.addHook</code>
+    function.  (This same hook instance can be removed with the
+    <code>empy.removeHook</code> function.)</p>
+<p>    More than one hook instance can be registered with an interpreter;
+    in such a case, the appropriate methods are invoked on each
+    instance in the order in which they were registered.  To adjust
+    this behavior, an optional <code>prepend</code> argument to the
+    <code>empy.addHook</code> function can be used dictate that the new hook
+    should placed at the <em>beginning</em> of the sequence of hooks, rather
+    than at the end (which is the default).</p>
+<p>    All hooks can be enabled and disabled entirely for a given
+    interpreter; this is done with the <code>empy.enableHooks</code> and
+    <code>empy.disableHooks</code> functions.  By default hooks are enabled, but
+    obviously if no hooks have been registered no hook callbacks will
+    be made.  Whether hooks are enabled or disabled can be determined
+    by calling <code>empy.areHooksEnabled</code>.  To get a (copy of) the list of
+    registered hooks, call <code>empy.getHooks</code>.  Finally, to invoke a hook
+    manually, use <code>empy.invokeHook</code>.</p>
+<p>    For a list of supported hook callbacks, see the <code>empy.Hook</code> class
+    definition.</p>
+<p>    As a practical example, this sample Python code would print a
+    pound sign followed by the name of every file that is included
+    with 'empy.include':
+<pre>
+        class IncludeHook(empy.Hook):
+            def beforeInclude(self, name, file, locals):
+                print "# %s" % name
+
+        empy.addHook(IncludeHook())
+</pre>
+</p>
+<h3>Custom markup</h3>
+<p>    Since version 3.2.1, the markup '@<...>' is reserved for
+    user-defined use.  Unlike the other markups, this markup has no
+    specified meaning on its own, and can be provided a meaning by the
+    user.  This meaning is provided with the use of a "custom
+    callback," or just "callback," which can be set, queried, or reset
+    using the pseudomodule function.</p>
+<p>    The custom callback is a callable object which, when invoked, is
+    passed a single argument: a string representing the contents of
+    what was found inside the custom markup '@<...>'.</p>
+<p>    To register a callback, call <code>empy.registerCallback</code>.  To remove
+    one, call <code>empy.deregisterCallback</code>.  To retrieve the callback (if
+    any) registered with the interpreter, use <code>empy.getCallback</code>.
+    Finally, to invoke the callback just as if the custom markup were
+    encountered, call <code>empy.invokeCallback</code>.  For instance, '@<This
+    text>' would be equivalent to the call <code>@empy.invokeCallback("This
+    text")</code>.</p>
+<p>    By default, to invoke a callback (either explicitly with
+    <code>empy.invokeCallback</code> or by processing a '@<...>' custom markup)
+    when no callback has been registered is an error.  This behavior
+    can be changed with the <code>CALLBACK_OPT</code> option, or the
+    --no-callback-error command line option.</p>
+<h3>Pseudomodule</h3>
+<p>    The <code>empy</code> pseudomodule is available only in an operating EmPy
+    system.  (The name of the module, by default <code>empy</code>, can be
+    changed with the -m option or the <code>EMPY_PSEUDO</code> environment
+    variable).  It is called a pseudomodule because it is not actually
+    a module, but rather exports a module-like interface.  In fact,
+    the pseudmodule is actually the same internal object as the
+    interpreter itself.</p>
+<p>    The pseudomodule contains the following functions and objects (and
+    their signatures, with a suffixed <code>opt</code> indicating an optional
+    argument):</p>
+<p>    First, basic identification:</p>
+<dl>
+<dt>    <strong><code>VERSION</code></strong></dt>
+<dd>A constant variable which contains a
+      string representation of the EmPy version.</dd>
+<dt>    <strong><code>SIGNIFICATOR_RE_STRING</code></strong></dt>
+<dd>A constant variable representing a
+      regular expression string (using the default prefix) that can be
+      used to find significators in EmPy code.</dd>
+<dt>    <strong><code>SIGNIFICATOR_RE_SUFFIX</code></strong></dt>
+<dd>The portion of the significator
+      regular expression string excluding the prefix, so that those
+      using non-standard prefix can build their own custom regular
+      expression string with <code>myPrefix + empy.SIGNIFICATOR_RE_SUFFIX</code>.</dd>
+<dt>    <strong><code>interpreter</code></strong></dt>
+<dd>The instance of the interpreter that is
+      currently being used to perform execution.  <em>Note:</em> This is now
+      obsolete; the pseudomodule is itself the interpreter.  Instead
+      of using <code>empy.interpreter</code>, simply use <code>empy</code>.</dd>
+<dt>    <strong><code>argv</code></strong></dt>
+<dd>A list consisting of the name of the primary EmPy
+      script and its command line arguments, in analogue to the
+      <code>sys.argv</code> list.</dd>
+<dt>    <strong><code>args</code></strong></dt>
+<dd>A list of the command line arguments following the
+      primary EmPy script; this is equivalent to <code>empy.argv[1:]</code>.</dd>
+<dt>    <strong><code>identify() -&gt; string, integer</code></strong></dt>
+<dd>Retrieve identification
+      information about the current parsing context.  Returns a
+      2-tuple consisting of a filename and a line number; if the file
+      is something other than from a physical file (<em>e.g.</em>, an
+      explicit expansion with <code>empy.expand</code>, a file-like object within
+      Python, or via the -E or -F command line options), a string
+      representation is presented surrounded by angle brackets.  Note
+      that the context only applies to the <em>EmPy</em> context, not the
+      Python context.</dd>
+<dt>    <strong><code>atExit(callable)</code></strong></dt>
+<dd>Register a callable object (such as a
+      function) taking no arguments which will be called at the end of
+      a normal shutdown.  Callable objects registered in this way are
+      called in the reverse order in which they are added, so the
+      first callable registered with <code>empy.atExit</code> is the last one to
+      be called.  Note that although the functionality is related to
+      hooks, <code>empy.atExit</code> does no work via the hook mechanism, and
+      you are guaranteed that the interpreter and stdout will be in a
+      consistent state when the callable is invoked.</dd>
+</dl>
+<p>    Context manipulation:</p>
+<dl>
+<dt>    <strong><code>pushContext(name_opt, line_opt)</code></strong></dt>
+<dd>Create a new context with
+      the given name and line and push it on the stack.</dd>
+<dt>    <strong><code>popContext()</code></strong></dt>
+<dd>Pop the top context and dispose of it.</dd>
+<dt>    <strong><code>setContextName(name)</code></strong></dt>
+<dd>Manually set the name of the current
+      context.</dd>
+<dt>    <strong><code>setContextLine(line)</code></strong></dt>
+<dd>Manually set the line number of the
+      current context; line must be a numeric value.  Note that
+      afterward the line number will increment by one for each newline
+      that is encountered, as before.</dd>
+</dl>
+<p>    Globals manipulation:</p>
+<dl>
+<dt>    <strong><code>getGlobals()</code></strong></dt>
+<dd>Retrieve the globals dictionary for this
+      interpreter.  Unlike when calling <code>globals()</code> in Python, this
+      dictionary <em>can</em> be manipulated and you <em>can</em> expect changes you
+      make to it to be reflected in the interpreter that holds it.</dd>
+<dt>    <strong><code>setGlobals(globals)</code></strong></dt>
+<dd>Reseat the globals dictionary
+      associated with this interpreter to the provided mapping type.</dd>
+<dt>    <strong><code>updateGlobals(globals)</code></strong></dt>
+<dd>Merge the given dictionary into
+      this interpreter's globals.</dd>
+<dt>    <strong><code>clearGlobals(globals_opt)</code></strong></dt>
+<dd>Clear out the globals
+      (restoring, of course, the <code>empy</code> pseudomodule).  Optionally,
+      instead of starting with a refresh dictionary, use the
+      dictionary provided.</dd>
+<dt>    <strong><code>saveGlobals(deep=True)</code></strong></dt>
+<dd>Save a copy of the globals onto an
+      internal history stack from which it can be restored later.  The
+      optional <code>deep</code> argument indicates whether or not the copying
+      should be a deep copy (default) or a shallow one.  Copying is
+      done with <code>copy.deepcopy</code> or <code>copy.copy</code>, respectively.</dd>
+<dt>    <strong><code>restoreGlobals(destructive=True)</code></strong></dt>
+<dd>Restore the most
+      recently saved globals from the history stack to as the current
+      globals for this instance.  The optional <code>destructive</code> argument
+      indicates whether or not the restore should remove the restored
+      globals from the history stack (default), or whether it should
+      be left there for subsequent restores.</dd>
+</dl>
+<p>    Types:</p>
+<dl>
+<dt>    <strong><code>Interpreter</code></strong></dt>
+<dd>The actual interpreter class.</dd>
+</dl>
+<p>    The following functions allow direct execution; optional <code>locals</code>
+    arguments, if specified, are treated as the locals dictionary in
+    evaluation and execution:</p>
+<dl>
+<dt>    <strong><code>defined(name, locals_opt)</code></strong></dt>
+<dd>Return true if the given name
+      is defined either in the (optional) locals or the interpreter
+      globals; return false otherwise.</dd>
+<dt>    <strong><code>evaluate(expression, locals_opt)</code></strong></dt>
+<dd>Evaluate the given
+      expression.</dd>
+<dt>    <strong><code>serialize(expression, locals_opt)</code></strong></dt>
+<dd>Serialize the
+      expression, just as the interpreter would:  If it is not None,
+      convert it to a string with the <code>str</code> builtin function, and then
+      write out the result.  If it evaluates to None, do nothing.</dd>
+<dt>    <strong><code>execute(statements, locals_opt)</code></strong></dt>
+<dd>Execute the given
+      statement(s).</dd>
+<dt>    <strong><code>single(source, locals_opt)</code></strong></dt>
+<dd>Interpret the "single" source
+      code, just as the Python interactive interpreter would.</dd>
+<dt>    <strong><code>import_(name, locals_opt)</code></strong></dt>
+<dd>Import a module.</dd>
+<dt>    <strong><code>atomic(name, value, locals_opt)</code></strong></dt>
+<dd>Perform a single, atomic
+      assignment.  In this case name is the string denoating the name
+      of the (single) variable to be assigned to, and value is a
+      Python object which the name is to be bound to.</dd>
+<dt>    <strong><code>assign(name, value, locals_opt)</code></strong></dt>
+<dd>Perform general
+      assignment.  This decays to atomic assignment (above) in the
+      normal case, but supports "tuple unpacking" in the sense that if
+      name string contains commas, it is treated as a sequence of
+      names and memberwise assignment with each member of the value
+      (still a Python object, but which must be a sequence).  This
+      function will raise a <code>TypeError</code> or <code>ValueError</code> just like
+      Python would if tuple unpacking is not possible (that is, if the
+      value is not a sequence or is of an incompatible length,
+      respectively).  This only supports the assignment of Python
+      identifiers, not arbitrary Python lvalues.</dd>
+<dt>    <strong><code>significate(key, value_opt, locals_opt)</code></strong></dt>
+<dd>Do a manual
+      signification.  If <code>value</code> is not specified, it is treated as
+      <code>None</code>.</dd>
+</dl>
+<p>    The following functions relate to source manipulation:</p>
+<dl>
+<dt>    <strong><code>include(file_or_filename, locals_opt)</code></strong></dt>
+<dd>Include another
+      EmPy file, by processing it in place.  The argument can either
+      be a filename (which is then opened with <code>open</code> in text mode) or
+      a file object, which is used as is.  Once the included file is
+      processed, processing of the current file continues.  Includes
+      can be nested.  The call also takes an optional locals
+      dictionary which will be passed into the evaluation function.</dd>
+<dt>    <strong><code>expand(string, locals_opt)</code> -> string</strong></dt>
+<dd>Explicitly invoke
+      the EmPy parsing system to process the given string and return
+      its expansion.  This allows multiple levels of expansion,
+      <em>e.g.</em>, <code>@(empy.expand("@(2 + 2)"))</code>.  The call also takes an
+      optional locals dictionary which will be passed into the
+      evaluation function.  This is necessary when text is being
+      expanded inside a function definition and it is desired that the
+      function arguments (or just plain local variables) are available
+      to be referenced within the expansion.</dd>
+<dt>    <strong><code>quote(string) -&gt; string</code></strong></dt>
+<dd>The inverse process of
+      <code>empy.expand</code>, this will take a string and return a new string
+      that, when expanded, would expand to the original string.  In
+      practice, this means that appearances of the prefix character
+      are doubled, except when they appear inside a string literal.</dd>
+<dt>    <strong><code>escape(string, more_opt) -&gt; string</code></strong></dt>
+<dd>Given a string, quote
+      the nonprintable characters contained within it with EmPy
+      escapes.  The optional <code>more</code> argument specifies additional
+      characters that should be escaped.</dd>
+<dt>    <strong><code>flush()</code></strong></dt>
+<dd>Do an explicit flush on the underlying stream.</dd>
+<dt>    <strong><code>string(string, name_opt, locals_opt)</code></strong></dt>
+<dd>Explicitly process a
+      string-like object.  This differs from <code>empy.expand</code> in that the
+      string is directly processed into the EmPy system, rather than
+      being evaluated in an isolated context and then returned as a
+      string.</dd>
+</dl>
+<p>    Changing the behavior of the pseudomodule itself:</p>
+<dl>
+<dt>    <strong><code>flatten(keys_opt)</code></strong></dt>
+<dd>Perform the equivalent of <code>from empy
+      import ...</code> in code (which is not directly possible because
+      <code>empy</code> is a pseudomodule).  If keys is omitted, it is taken as
+      being everything in the <code>empy</code> pseudomodule.  Each of the
+      elements of this pseudomodule is flattened into the globals
+      namespace; after a call to <code>empy.flatten</code>, they can be referred
+      to simple as globals, <em>e.g.</em>, <code>@divert(3)</code> instead of
+      <code>@empy.divert(3)</code>.  If any preexisting variables are bound to
+      these names, they are silently overridden.  Doing this is
+      tantamount to declaring an <code>from ... import ...</code> which is often
+      considered bad form in Python.</dd>
+</dl>
+<p>    Prefix-related functions:</p>
+<dl>
+<dt>    <strong><code>getPrefix() -&gt; char</code></strong></dt>
+<dd>Return the current prefix.</dd>
+<dt>    <strong><code>setPrefix(char)</code></strong></dt>
+<dd>Set a new prefix.  Immediately after this
+      call finishes, the prefix will be changed.  Changing the prefix
+      affects only the current interpreter; any other created
+      interpreters are unaffected.  Setting the prefix to None or the
+      null string means that no further markups will be processed,
+      equivalent to specifying the --no-prefix command line argument.</dd>
+</dl>
+<p>    Diversions:</p>
+<dl>
+<dt>    <strong><code>stopDiverting()</code></strong></dt>
+<dd>Any diversions that are currently taking
+      place are stopped; thereafter, output will go directly to the
+      output file as normal.  It is never illegal to call this
+      function.</dd>
+<dt>    <strong><code>createDiversion(name)</code></strong></dt>
+<dd>Create a diversion, but do not
+      begin diverting to it.  This is the equivalent of starting a
+      diversion and then immediately stopping diversion; it is used in
+      cases where you want to make sure that a diversion will exist
+      for future replaying but may be empty.</dd>
+<dt>    <strong><code>startDiversion(name)</code></strong></dt>
+<dd>Start diverting to the specified
+      diversion name.  If such a diversion does not already exist, it
+      is created; if it does, then additional material will be
+      appended to the preexisting diversions.</dd>
+<dt>    <strong><code>playDiversion(name)</code></strong></dt>
+<dd>Recall the specified diversion and
+      then purge it.  The provided diversion name must exist.</dd>
+<dt>    <strong><code>replayDiversion(name)</code></strong></dt>
+<dd>Recall the specified diversion
+      without purging it.  The provided diversion name must exist.</dd>
+<dt>    <strong><code>purgeDiversion(name)</code></strong></dt>
+<dd>Purge the specified diversion
+      without recalling it.  The provided diversion name must exist.</dd>
+<dt>    <strong><code>playAllDiversions()</code></strong></dt>
+<dd>Play (and purge) all existing
+      diversions in the sorted order of their names.  This call does
+      an implicit <code>empy.stopDiverting</code> before executing.</dd>
+<dt>    <strong><code>replayAllDiversions()</code></strong></dt>
+<dd>Replay (without purging) all
+      existing diversions in the sorted order of their names.  This
+      call does an implicit <code>empy.stopDiverting</code> before executing.</dd>
+<dt>    <strong><code>purgeAllDiversions()</code></strong></dt>
+<dd>Purge all existing diversions
+      without recalling them.  This call does an implicit
+      <code>empy.stopDiverting</code> before executing.</dd>
+<dt>    <strong><code>getCurrentDiversion() -&gt; diversion</code></strong></dt>
+<dd>Return the name of the
+      current diversion.</dd>
+<dt>    <strong><code>getAllDiversions() -&gt; sequence</code></strong></dt>
+<dd>Return a sorted list of
+      all existing diversions.</dd>
+</dl>
+<p>    Filters:</p>
+<dl>
+<dt>    <strong><code>getFilter() -&gt; filter</code></strong></dt>
+<dd>Retrieve the current filter.
+      <code>None</code> indicates no filter is installed.</dd>
+<dt>    <strong><code>resetFilter()</code></strong></dt>
+<dd>Reset the filter so that no filtering is
+      done.</dd>
+<dt>    <strong><code>nullFilter()</code></strong></dt>
+<dd>Install a special null filter, one which
+      consumes all text and never sends any text to the output.</dd>
+<dt>    <strong><code>setFilter(shortcut)</code></strong></dt>
+<dd>Install a new filter.  A filter is
+      <code>None</code> or an empty sequence representing no filter, or <code>0</code> for a
+      null filter, a function for a function filter, a string for a
+      string filter, or an instance of <code>empy.Filter</code> (or a workalike
+      object).  If filter is a list of the above things, they will be
+      chained together manually; if it is only one, it will be
+      presumed to be solitary or to have already been manually chained
+      together.  See the "Filters" section for more information.</dd>
+<dt>    <strong><code>attachFilter(shortcut)</code></strong></dt>
+<dd>Attach a single filter (sequences
+      are not allowed here) to the end of a currently existing filter
+      chain, or if there is no current chain, install it as
+      <code>empy.setFilter</code> would.  As with <code>empy.setFilter</code>, the shortcut
+      versions of filters are also allowed here.</dd>
+</dl>
+<p>    Hooks:</p>
+<dl>
+<dt>    <strong><code>areHooksEnabled()</code></strong></dt>
+<dd>Return whether or not hooks are
+      presently enabled.</dd>
+<dt>    <strong><code>enableHooks()</code></strong></dt>
+<dd>Enable invocation of hooks.  By default
+      hooks are enabled.</dd>
+<dt>    <strong><code>disableHooks()</code></strong></dt>
+<dd>Disable invocation of hooks.  Hooks can
+      still be added, removed, and queried, but invocation of hooks
+      will not occur (even explicit invocation with
+      <code>empy.invokeHook</code>).</dd>
+<dt>    <strong><code>getHooks()</code></strong></dt>
+<dd>Get a (copy of the) list of the hooks
+      currently registered.</dd>
+<dt>    <strong><code>clearHooks()</code></strong></dt>
+<dd>Clear all the hooks registered with this
+      interpreter.</dd>
+<dt>    <strong><code>addHook(hook, prepend_opt)</code></strong></dt>
+<dd>Add this hook to the hooks
+      associated with this interpreter.  By default, the hook is
+      appended to the end of the existing hooks, if any; if the
+      optional insert argument is present and true, it will be
+      prepended to the list instead.</dd>
+<dt>    <strong><code>removeHook(hook)</code></strong></dt>
+<dd>Remove this hook from the hooks
+      associated with this interpreter.</dd>
+<dt>    <strong><code>invokeHook(_name, ...)</code></strong></dt>
+<dd>Manually invoke a hook method.
+      The remaining arguments are treated as keyword arguments and the
+      resulting dictionary is passed in as the second argument to the
+      hooks.</dd>
+</dl>
+<p>    Custom markup callback:</p>
+<dl>
+<dt>    <strong><code>getCallback() -&gt; callback</code></strong></dt>
+<dd>Retrieve the current callback
+      associated with this interpreter, or <code>None</code> if it does not yet
+      have one.</dd>
+<dt>    <strong><code>registerCallback(callback)</code></strong></dt>
+<dd>Register a callback to be
+      called whenever a custom markup ('@<...>') is encountered.  When
+      encountered, <code>invokeCallback</code> is called.</dd>
+<dt>    <strong><code>deregisterCallback()</code></strong></dt>
+<dd>Clear any callback previously
+      registered with the interpreter for being called when a custom
+      markup is encountered.</dd>
+<dt>    <strong><code>invokeCallback(contents)</code></strong></dt>
+<dd>Invoke a custom callback.  This
+      function is called whenever a custom markup ('@<...>') is
+      encountered.  It in turn calls the registered callback, with a
+      single argument, <code>contents</code>, which is a string representing of
+      the contents of the custom markup.</dd>
+</dl>
+<h3>Invocation</h3>
+<p>    Basic invocation involves running the interpreter on an EmPy file
+    and some optional arguments.  If no file are specified, or the
+    file is named <code>-</code>, EmPy takes its input from stdin.  One can
+    suppress option evaluation (to, say, specify a file that begins
+    with a dash) by using the canonical <code>--</code> option.</p>
+<dl>
+<dt>    <strong><code>-h</code>/<code>--help</code></strong></dt>
+<dd>Print usage and exit.</dd>
+<dt>    <strong><code>-H</code>/<code>--extended-help</code></strong></dt>
+<dd>Print extended usage and exit.
+      Extended usage includes a rundown of all the legal expansions,
+      escape sequences, pseudomodule contents, used hooks, and
+      supported environment variables.</dd>
+<dt>    <strong><code>-v</code>/<code>--verbose</code></strong></dt>
+<dd>The EmPy system will print all manner of
+      details about what it is doing and what it is processing to
+      stderr.</dd>
+<dt>    <strong><code>-V</code>/<code>--version</code></strong></dt>
+<dd>Print version and exit.</dd>
+<dt>    <strong><code>-a</code>/<code>--append</code> (filename)</strong></dt>
+<dd>Open the specified file for
+      append instead of using stdout.</dd>
+<dt>    <strong><code>-b</code>/<code>--buffered-output</code></strong></dt>
+<dd>Fully buffer processing output,
+      including the file open itself.  This is helpful when, should an
+      error occur, you wish that no output file be generated at all
+      (for instance, when using EmPy in conjunction with make).  When
+      specified, either the -o or -a options must be specified, and
+      the -b option must precede them.  This can also be specified
+      through the existence of the <code>EMPY_BUFFERED_OUTPUT</code> environment
+      variable.</dd>
+<dt>    <strong><code>-f</code>/<code>--flatten</code></strong></dt>
+<dd>Before processing, move the contents of
+      the <code>empy</code> pseudomodule into the globals, just as if
+      <code>empy.flatten()</code> were executed immediately after starting the
+      interpreter.  That is, <em>e.g.</em>, <code>empy.include</code> can be referred to
+      simply as <code>include</code> when this flag is specified on the command
+      line.  This can also be specified through the existence of the
+      <code>EMPY_FLATTEN</code> environment variable.</dd>
+<dt>    <strong><code>-i</code>/<code>--interactive</code></strong></dt>
+<dd>After the main EmPy file has been
+      processed, the state of the interpreter is left intact and
+      further processing is done from stdin.  This is analogous to the
+      Python interpreter's -i option, which allows interactive
+      inspection of the state of the system after a main module is
+      executed.  This behaves as expected when the main file is stdin
+      itself.  This can also be specified through the existence of the
+      <code>EMPY_INTERACTIVE</code> environment variable.</dd>
+<dt>    <strong><code>-k</code>/<code>--suppress-errors</code></strong></dt>
+<dd>Normally when an error is
+      encountered, information about its location is printed and the
+      EmPy interpreter exits.  With this option, when an error is
+      encountered (except for keyboard interrupts), processing stops
+      and the interpreter enters interactive mode, so the state of
+      affairs can be assessed.  This is also helpful, for instance,
+      when experimenting with EmPy in an interactive manner.  -k
+      implies -i.</dd>
+<dt>    <strong><code>-n</code>/<code>--no-override-stdout</code></strong></dt>
+<dd>Do not override <code>sys.stdout</code>
+      with a proxy object which the EmPy system interacts with.  If
+      suppressed, this means that side effect printing will not be
+      captured and routed through the EmPy system.  However, if this
+      option is specified, EmPy can support multithreading.</dd>
+<dt>    <strong><code>-o</code>/<code>--output</code> (filename)</strong></dt>
+<dd>Open the specified file for
+      output instead of using stdout.  If a file with that name
+      already exists it is overwritten.</dd>
+<dt>    <strong><code>-p</code>/<code>--prefix</code> (prefix)</strong></dt>
+<dd>Change the prefix used to detect
+      expansions.  The argument is the one-character string that will
+      be used as the prefix.  Note that whatever it is changed to, the
+      way to represent the prefix literally is to double it, so if <code>$</code>
+      is the prefix, a literal dollar sign is represented with <code>$$</code>.
+      Note that if the prefix is changed to one of the secondary
+      characters (those that immediately follow the prefix to indicate
+      the type of action EmPy should take), it will not be possible to
+      represent literal prefix characters by doubling them (<em>e.g.</em>, if
+      the prefix were inadvisedly changed to <code>#</code> then <code>##</code> would
+      already have to represent a comment, so <code>##</code> could not represent
+      a literal <code>#</code>).  This can also be specified through the
+      <code>EMPY_PREFIX</code> environment variable.</dd>
+<dt>    <strong><code>-r</code>/<code>--raw-errors</code></strong></dt>
+<dd>Normally, EmPy catches Python
+      exceptions and prints them alongside an error notation
+      indicating the EmPy context in which it occurred.  This option
+      causes EmPy to display the full Python traceback; this is
+      sometimes helpful for debugging.  This can also be specified
+      through the existence of the <code>EMPY_RAW_ERRORS</code> environment
+      variable.</dd>
+<dt>    <strong><code>-u</code>/<code>--unicode</code></strong></dt>
+<dd>Enable the Unicode subsystem.  This option
+      only need be present if you wish to enable the Unicode subsystem
+      with the defaults; any other Unicode-related option (starting
+      with --unicode...) will also enable the Unicode subsystem.</dd>
+<dt>    <strong><code>-D</code>/<code>--define</code> (assignment)</strong></dt>
+<dd>Execute a Python assignment of
+      the form <code>variable = expression</code>.  If only a variable name is
+      provided (<em>i.e.</em>, the statement does not contain an <code>=</code> sign),
+      then it is taken as being assigned to None.  The -D option is
+      simply a specialized -E option that special cases the lack of an
+      assignment operator.  Multiple -D options can be specified.</dd>
+<dt>    <strong><code>-E</code>/<code>--execute</code> (statement)</strong></dt>
+<dd>Execute the Python (not EmPy)
+      statement before processing any files.  Multiple -E options can
+      be specified.</dd>
+<dt>    <strong><code>-F</code>/<code>--execute-file</code> (filename)</strong></dt>
+<dd>Execute the Python (not
+      EmPy) file before processing any files.  This is equivalent to
+      <code>-E execfile("filename")</code> but provides a more readable context.
+      Multiple -F options can be specified.</dd>
+<dt>    <strong><code>-I</code>/<code>--import</code> (module)</strong></dt>
+<dd>Imports the specified module name
+      before processing any files.  Multiple modules can be specified
+      by separating them by commas, or by specifying multiple -I
+      options.</dd>
+<dt>    <strong><code>-P</code>/<code>--preprocess</code> (filename)</strong></dt>
+<dd>Process the EmPy file before
+      processing the primary EmPy file on the command line.</dd>
+<dt>    <strong><code>--binary</code></strong></dt>
+<dd>Treat the file as a binary file, and read in
+      chunks rather than line by line.  In this mode, the "line"
+      indicator represents the number of bytes read, not the number of
+      lines processed.</dd>
+<dt>    <strong><code>--no-prefix</code></strong></dt>
+<dd>Disable the prefixing system entirely; when
+      specified, EmPy will not expand any markups.  This allows EmPy
+      to merely act as a Unicode encoding translator..</dd>
+<dt>    <strong><code>--pause-at-end</code></strong></dt>
+<dd>If present, then <code>raw_input</code> will be
+      called at the end of processing.  Useful in systems where the
+      output window would otherwise be closed by the operating
+      system/window manager immediately after EmPy exited.</dd>
+<dt>    <strong><code>--relative-path</code></strong></dt>
+<dd>When present, the path the EmPy script
+      being invoked is contained in will be prepended to <code>sys.path</code>.
+      This is analogous to Python's internal handling of <code>sys.path</code>
+      and scripts.  If input is from stdin (<code>-</code> for a filename or no
+      filename is specified), then nothing is added to the path.</dd>
+<dt>    <strong><code>--no-callback-error</code></strong></dt>
+<dd>Do not consider it an error if the
+      custom markup is invoked '@<...>' and there is no callback
+      function registered for it.</dd>
+<dt>    <strong><code>--chunk-size</code> (chunk)</strong></dt>
+<dd>Use the specific binary chunk size
+      rather than the default; implies --binary.</dd>
+<dt>    <strong><code>--unicode-encoding</code> (encoding)</strong></dt>
+<dd>Specify the Unicode
+      encoding to be used for both input and output.</dd>
+<dt>    <strong><code>--unicode-input-encoding</code> (encoding)</strong></dt>
+<dd>Specify the Unicode
+      encoding to be used for input.</dd>
+<dt>    <strong><code>--unicode-output-encoding</code> (encoding)</strong></dt>
+<dd>Specify the Unicode
+      encoding to be used for output.</dd>
+<dt>    <strong>'--unicode-input-errors (errors)</strong></dt>
+<dd>Specify the Unicode error
+      handling to be used for input.</dd>
+<dt>    <strong>'--unicode-errors (errors)</strong></dt>
+<dd>Specify the Unicode error
+      handling to be used for both input and output.</dd>
+<dt>    <strong>'--unicode-output-errors (errors)</strong></dt>
+<dd>Specify the Unicode error
+      handling to be used for output.</dd>
+</dl>
+<h3>Environment variables</h3>
+<p>    EmPy also supports a few environment variables to predefine
+    certain behaviors.  The settings chosen by environment variables
+    can be overridden via command line arguments.  The following
+    environment variables have meaning to EmPy:</p>
+<dl>
+<dt>    <strong><code>EMPY_OPTIONS</code></strong></dt>
+<dd>If present, the contents of this environment
+      variable will be treated as options, just as if they were
+      entered on the command line, <em>before</em> the actual command line
+      arguments are processed.  Note that these arguments are <em>not</em>
+      processed by the shell, so quoting, filename globbing, and the
+      like, will not work.</dd>
+<dt>    <strong><code>EMPY_PREFIX</code></strong></dt>
+<dd>If present, the value of this environment
+      variable represents the prefix that will be used; this is
+      equivalent to the -p command line option.</dd>
+<dt>    <strong><code>EMPY_PSEUDO</code></strong></dt>
+<dd>If present, the value of this environment
+      variable represents the name of the pseudomodule that will be
+      incorporated into every running EmPy system; this is equivalent
+      to the -m command line option.</dd>
+<dt>    <strong><code>EMPY_FLATTEN</code></strong></dt>
+<dd>If defined, this is equivalent to including
+      -f on the command line.</dd>
+<dt>    <strong><code>EMPY_RAW_ERRORS</code></strong></dt>
+<dd>If defined, this is equivalent to
+      including -r on the command line.</dd>
+<dt>    <strong><code>EMPY_INTERACTIVE</code></strong></dt>
+<dd>If defined, this is equivalent to
+      including -i on the command line.</dd>
+<dt>    <strong><code>EMPY_BUFFERED_OUTPUT</code></strong></dt>
+<dd>If defined, this is equivalent to
+      including -b on the command line.</dd>
+<dt>    <strong><code>EMPY_UNICODE</code></strong></dt>
+<dd>If defined, this is equivalent to including
+      -u on the command line.</dd>
+<dt>    <strong><code>EMPY_UNICODE_INPUT_ENCODING</code></strong></dt>
+<dd>If present, the value of this
+      environment variable indicates the name of the Unicode input
+      encoding to be used.  This is equivalent to the
+      --unicode-input-encoding command line option.</dd>
+<dt>    <strong><code>EMPY_UNICODE_OUTPUT_ENCODING</code></strong></dt>
+<dd>If present, the value of
+      this environment variable indicates the name of the Unicode
+      output encoding to be used.  This is equivalent to the
+      --unicode-output-encoding command line option.</dd>
+<dt>    <strong><code>EMPY_UNICODE_INPUT_ERRORS</code></strong></dt>
+<dd>If present, the value of this
+      environment variable indicates the name of the error handler to
+      be used for input.  This is equivalent to the
+      --unicode-input-errors command line option.</dd>
+<dt>    <strong><code>EMPY_UNICODE_OUTPUT_ERRORS</code></strong></dt>
+<dd>If present, the value of this
+      environment variable indicates the name of the error handler to
+      be used for output.  This is equivalent to the
+      --unicode-output-errors command line option.</dd>
+</dl>
+<h3>Examples and testing EmPy</h3>
+<p>    See the sample EmPy file <code>sample.em</code> which is included with the
+    distribution.  Run EmPy on it by typing something like:
+<pre>
+         ./em.py sample.em
+</pre>
+</p>
+<p>    and compare the results and the sample source file side by side.
+    The sample content is intended to be self-documenting, and even an
+    introduction to the basic features of EmPy while simultaneously
+    exercising them.</p>
+<p>    The file <code>sample.bench</code> is the benchmark output of the sample.
+    Running the EmPy interpreter on the provided <code>sample.em</code> file
+    should produce precisely the same results.  You can run the
+    provided test script to see if your EmPy environment is behaving
+    as expected (presuming a Unix-like operating system):
+<pre>
+        ./test.sh
+</pre>
+</p>
+<p>    By default this will test with the first Python interpreter
+    available in the path; if you want to test with another
+    interpreter, you can provide it as the first argument on the
+    command line, <em>e.g.</em>:
+<pre>
+        ./test.sh python2.1
+        ./test.sh /usr/bin/python1.5
+        ./test.sh jython
+</pre>
+</p>
+<p>    A more comprehensive test suite and set of real-world examples is
+    planned for a future version.</p>
+<h3>Embedding EmPy</h3>
+<p>    For atomic applications, the <code>expand</code> function is provided (the
+    extra keyword arguments passed in are treated as locals):
+<pre>
+        import em
+        print em.expand("@x + @y is @(x + y).", x=2, y=3)
+</pre>
+</p>
+<p>    One can specify a globals dictionary and all the other interpreter
+    options (below) as well.  One can specify a globals dictionary
+    that will be used if one wants persistence:
+<pre>
+        import em
+        g = {}
+        em.expand("@{x = 10}", g)
+        print em.expand("x is @x.", g)
+</pre>
+</p>
+<p>    The standalone <code>expand</code> function, however, creates and destroys an
+    <code>Interpreter</code> instance each time it is called.  For repeated
+    expansions, this can be expensive.  Instead, you will probably
+    want to use the full-fledged features of embedding.  An EmPy
+    interpreter can be created with as code as simple as:
+<pre>
+        import em
+        interpreter = em.Interpreter()
+        # The following prints the results to stdout:
+        interpreter.string("@{x = 123}@x\n")
+        # This expands to the same thing, but puts the results as a
+        # string in the variable result:
+        result = interpreter.expand("@{x = 123}@x\n")
+        # This just prints the value of x directly:
+        print interpreter.globals['x']
+        # Process an actual file (and output to stdout):
+        interpreter.file(open('/path/to/some/file'))
+        interpreter.shutdown() # this is important; see below
+</pre>
+</p>
+<p>    One can capture the output of a run in something other than stdout
+    by specifying the <em>output</em> parameter:
+<pre>
+        import em, StringIO
+        output = StringIO.StringIO()
+        interpreter = em.Interpreter(output=output)
+        # Do something.
+        interpreter.file(open('/path/to/some/file'))
+        interpreter.shutdown() # again, this is important; see below
+        print output.getvalue() # this is the result from the session
+</pre>
+</p>
+<p>    When you are finished with your interpreter, it is important to
+    call its shutdown method:
+<pre>
+        interpreter.shutdown()
+</pre>
+</p>
+<p>    This will ensure that the interpreter cleans up all its overhead,
+    entries in the <code>sys.stdout</code> proxy, and so forth.  It is usually
+    advisable that this be used in a try...finally clause:
+<pre>
+        interpreter = em.Interpreter(...)
+        try:
+            ...
+        finally:
+            interpreter.shutdown()
+</pre>
+</p>
+<p>    The <code>em.Interpreter</code> constructor takes the following arguments;
+    all are optional.  Since options may be added in the future, it is
+    highly recommended that the constructor be invoked via keyword
+    arguments, rather than assuming their order.  The arguments are:</p>
+<dl>
+<dt>    <em>output</em></dt>
+<dd>The output file which the interpreter will be sending
+     all its processed data to.  This need only be a file-like object;
+     it need not be an actual file.  If omitted, <code>sys.__stdout__</code> is
+     used.</dd>
+<dt>    <em>argv</em></dt>
+<dd>An argument list analogous to <code>sys.argv</code>, consisting of
+     the script name and zero or more arguments.  These are available
+     to executing interpreters via <code>empy.argv</code> and <code>empy.args</code>.  If
+     omitted, a non-descript script name is used with no arguments.</dd>
+<dt>    <em>prefix</em></dt>
+<dd>The prefix (a single-character string).  Defaults to
+     <code>@</code>.  It is an error for this to be anything other than one
+     character.</dd>
+<dt>    <em>pseudo</em></dt>
+<dd>The name (string) of the pseudmodule.  Defaults to
+     <code>empy</code>.</dd>
+<dt>    <em>options</em></dt>
+<dd>A dictionary of options that can override the default
+     behavior of the interpreter.  The names of the options are
+     constant names ending in <code>_OPT</code> and their defaults are given in
+     <code>Interpreter.DEFAULT_OPTIONS</code>.</dd>
+<dt>    <em>globals</em></dt>
+<dd>By default, interpreters begin with a pristine
+     dictionary of globals (except, of course, for the <code>empy</code>
+     pseudomodule).  Specifying this argument will allow the globals
+     to start with more.</dd>
+<dt>    <em>hooks</em></dt>
+<dd>A sequence of hooks (or <code>None</code> for none) to register
+     with the interpreter at startup.  Hooks can, of course, be added
+     after the fact, but this allows the hooks to intercept the
+     <code>atStartup</code> event (otherwise, the startup event would already
+     have occurred by the time new hooks could be registered)..</dd>
+</dl>
+<p>    Many things can be done with EmPy interpreters; for the full
+    developer documentation, see the generated documentation for the
+    <code>em</code> module.</p>
+<h3>Interpreter options</h3>
+<p>    The following options (passed in as part of the options dictionary
+    to the Interpreter constructor) have the following meanings.  The
+    defaults are shown below and are also indicated in an
+    <code>Interpreter.DEFAULT_OPTIONS</code> dictionary.</p>
+<dl>
+<dt>    <strong><code>BANGPATH_OPT</code></strong></dt>
+<dd>Should a bangpath (<code>#!</code>) as the first line
+      of an EmPy file be treated as if it were an EmPy comment?  Note
+      that <code>#!</code> sequences starting lines or appearing anywhere else in
+      the file are untouched regardless of the value of this option.
+      Default: true.</dd>
+<dt>    <strong><code>BUFFERED_OPT</code></strong></dt>
+<dd>Should an <code>abort</code> method be called upon
+      failure?  This relates to the fully-buffered option, where all
+      output can be buffered including the file open; this option only
+      relates to the interpreter's behavior <em>after</em> that proxy file
+      object has been created.  Default: false.</dd>
+<dt>    <strong><code>RAW_OPT</code></strong></dt>
+<dd>Should errors be displayed as raw Python errors
+      (that is, the exception is allowed to propagate through to the
+      toplevel so that the user gets a standard Python traceback)?
+      Default: false.</dd>
+<dt>    <strong><code>EXIT_OPT</code></strong></dt>
+<dd>Upon an error, should execution continue
+      (although the interpreter stacks will be purged)?  Note that
+      even in the event this is set, the interpreter will halt upon
+      receiving a <code>KeyboardInterrupt</code>.  Default: true.</dd>
+<dt>    <strong><code>FLATTEN_OPT</code></strong></dt>
+<dd>Upon initial startup, should the <code>empy</code>
+      pseudomodule namespace be flattened, <em>i.e.</em>, should
+      <code>empy.flatten</code> be called?  Note this option only has an effect
+      when the interpreter is first created; thereafter it is
+      ignored.  Default: false.</dd>
+<dt>    <strong><code>OVERRIDE_OPT</code></strong></dt>
+<dd>Should the <code>sys.stdout</code> object be overridden
+      with a proxy object?  If not, side effect output cannot be
+      captured by the EmPy system, but EmPy will support
+      multithreading.  Default: true.</dd>
+<dt>    <strong><code>CALLBACK_OPT</code></strong></dt>
+<dd>If a callback is invoked when none has yet
+      been registered, should an error be raised or should the
+      situation be ignored?  Default: true.</dd>
+</dl>
+<h3>Data flow</h3>
+<p>    <strong>input -> interpreter -> diversions -> filters -> output</strong></p>
+<p>    Here, in summary, is how data flows through a working EmPy system:</p>
+
+<ol>
+<li><p> Input comes from a source, such an .em file on the command
+       line, or via an <code>empy.include</code> statement.</p></li>
+<li><p> The interpreter processes this material as it comes in,
+       expanding EmPy expansions as it goes.</p></li>
+<li><p> After interpretation, data is then sent through the diversion
+       layer, which may allow it directly through (if no diversion is
+       in progress) or defer it temporarily.  Diversions that are
+       recalled initiate from this point.</p></li>
+<li><p> Any filters in place are then used to filter the data and
+       produce filtered data as output.</p></li>
+<li><p> Finally, any material surviving this far is sent to the output
+       stream.  That stream is stdout by default, but can be changed
+       with the -o or -a options, or may be fully buffered with the -b
+       option (that is, the output file would not even be opened until
+       the entire system is finished).</p></li>
+
+</ol>
+<h3>Author's notes</h3>
+<p>    I originally conceived EmPy as a replacement for my <a href="http://www.alcyone.com/max/info/m4.html">Web
+    templating system</a> which
+    uses <a href="http://www.seindal.dk/rene/gnu/">m4</a> (a general
+    macroprocessing system for Unix).</p>
+<p>    Most of my Web sites include a variety of m4 files, some of which
+    are dynamically generated from databases, which are then scanned
+    by a cataloging tool to organize them hierarchically (so that,
+    say, a particular m4 file can understand where it is in the
+    hierarchy, or what the titles of files related to it are without
+    duplicating information); the results of the catalog are then
+    written in database form as an m4 file (which every other m4 file
+    implicitly includes), and then GNU make converts each m4 to an
+    HTML file by processing it.</p>
+<p>    As the Web sites got more complicated, the use of m4 (which I had
+    originally enjoyed for the challenge and abstractness) really
+    started to become an impediment to serious work; while I am very
+    knowledgeable about m4 -- having used it for for so many years --
+    getting even simple things done with it is awkward and difficult.
+    Worse yet, as I started to use Python more and more over the
+    years, the cataloging programs which scanned the m4 and built m4
+    databases were migrated to Python and made almost trivial, but
+    writing out huge awkward tables of m4 definitions simply to make
+    them accessible in other m4 scripts started to become almost
+    farcical -- especially when coupled with the difficulty in getting
+    simple things done in m4.</p>
+<p>    It occurred to me what I really wanted was an all-Python solution.
+    But replacing what used to be the m4 files with standalone Python
+    programs would result in somewhat awkward programs normally
+    consisting mostly of unprocessed text punctuated by small portions
+    where variables and small amounts of code need to be substituted.
+    Thus the idea was a sort of inverse of a Python interpreter: a
+    program that normally would just pass text through unmolested, but
+    when it found a special signifier would execute Python code in a
+    normal environment.  I looked at existing Python templating
+    systems, and didn't find anything that appealed to me -- I wanted
+    something where the desired markups were simple and unobtrusive.
+    After considering between choices of signifiers, I settled on <code>@</code>
+    and EmPy was born.</p>
+<p>    As I developed the tool, I realized it could have general appeal,
+    even to those with widely varying problems to solve, provided the
+    core tool they needed was an interpreter that could embed Python
+    code inside templated text.  As I continue to use the tool, I have
+    been adding features as unintrusively as possible as I see areas
+    that can be improved.</p>
+<p>    A design goal of EmPy is that its feature set should work on
+    several levels; at each level, if the user does not wish or need
+    to use features from another level, they are under no obligation
+    to do so.  If you have no need of diversions, for instance, you
+    are under no obligation to use them.  If significators will not
+    help you organize a set of EmPy scripts globally, then you need
+    not use them.  New features that are being added are whenever
+    possible transparently backward compatible; if you do not need
+    them, their introduction should not affect you in any way.  The
+    use of unknown prefix sequences results in errors, guaranteeing
+    that they are reserved for future use.</p>
+<h3>Glossary</h3>
+<dl>
+<dt>    <strong>control</strong></dt>
+<dd>A control markup, used to direct high-level control
+      flow within an EmPy session.  Control markups are expressed with
+      the <code>@[...]</code> notation.</dd>
+<dt>    <strong>diversion</strong></dt>
+<dd>A process by which output is deferred, and can be
+      recalled later on demand, multiple times if necessary.</dd>
+<dt>    <strong>document</strong></dt>
+<dd>The abstraction of an EmPy document as used by a
+      processor.</dd>
+<dt>    <strong>escape</strong></dt>
+<dd>A markup designed to expand to a single (usually
+      non-printable) character, similar to escape sequences in C or
+      other languages.</dd>
+<dt>    <strong>expansion</strong></dt>
+<dd>The process of processing EmPy markups and
+      producing output.</dd>
+<dt>    <strong>expression</strong></dt>
+<dd>An expression markup represents a Python
+      expression to be evaluated, and replaced with the <code>str</code> of its
+      value.  Expression markups are expressed with the <code>@(...)</code>
+      notation.</dd>
+<dt>    <strong>filter</strong></dt>
+<dd>A file-like object which can be chained to other
+      objects (primarily the final stream) and can buffer, alter, or
+      manipulate in any way the data sent.  Filters can also be
+      chained together in arbitrary order.</dd>
+<dt>    <strong>globals</strong></dt>
+<dd>The dictionary (or dictionary-like object) which
+      resides inside the interpreter and holds the currently-defined
+      variables.</dd>
+<dt>    <strong>hook</strong></dt>
+<dd>A callable object that can be registered in a
+      dictionary, and which will be invoked before, during, or after
+      certain internal operations, identified by name with a string.</dd>
+<dt>    <strong>interpreter</strong></dt>
+<dd>The application (or class instance) which
+      processes EmPy markup.</dd>
+<dt>    <strong>markup</strong></dt>
+<dd>EmPy substitutions set off with a prefix and
+      appropriate delimeters.</dd>
+<dt>    <strong>output</strong></dt>
+<dd>The final destination of the result of processing an
+      EmPy file.</dd>
+<dt>    <strong>prefix</strong></dt>
+<dd>The ASCII character used to set off an expansions.
+      By default, <code>@</code>.</dd>
+<dt>    <strong>processor</strong></dt>
+<dd>An extensible system which processes a group of
+      EmPy files, usually arranged in a filesystem, and scans them for
+      significators.</dd>
+<dt>    <strong>pseudomodule</strong></dt>
+<dd>The module-like object named <code>empy</code> which is
+      exposed internally inside every EmPy system.</dd>
+<dt>    <strong>shortcut</strong></dt>
+<dd>A special object which takes the place of an
+      instance of the <code>Filter</code> class, to represent a special form of
+      filter.  These include 0 for a null filter, a callable (function
+      or lambda) to represent a callable filter, or a 256-character
+      string which represents a translation filter.</dd>
+<dt>    <strong>significator</strong></dt>
+<dd>A special form of an assignment markup in EmPy
+      which can be easily parsed externally, primarily designed for
+      representing uniform assignment across a collection of files.
+      Significators are indicated with the <code>@%</code> markup.</dd>
+<dt>    <strong>statement</strong></dt>
+<dd>A line of code that needs to be executed;
+      statements do not have return values.  In EmPy, statements are
+      set off with <code>@{...}</code>.</dd>
+</dl>
+<h3>Acknowledgements</h3>
+<p>    Questions, suggestions, bug reports, evangelism, and even
+    complaints from many people have helped make EmPy what it is
+    today.  Some, but by no means all, of these people are (in
+    alphabetical order by surname):</p>
+
+<ul>
+<li><p>Biswapesh Chattopadhyay</p></li>
+<li><p>Beni Cherniavsky</p></li>
+<li><p>Dr. S. Candelaria de Ram</p></li>
+<li><p>Eric Eide</p></li>
+<li><p>Dinu Gherman</p></li>
+<li><p>Grzegorz Adam Hankiewicz</p></li>
+<li><p>Bohdan Kushnir</p></li>
+<li><p>Robert Kroeger</p></li>
+<li><p>Kouichi Takahashi</p></li>
+<li><p>Ville Vainio</p></li>
+
+</ul>
+<h3>Known issues and caveats</h3>
+
+<ul>
+<li><p>EmPy was primarily intended for static processing of documents,
+      rather than dynamic use, and hence speed of processing was not
+      the primary consideration in its design.</p></li>
+<li><p>EmPy is not threadsafe by default.  This is because of the need
+      for EmPy to override the <code>sys.stdout</code> file with a proxy object
+      which can capture effects of <code>print</code> and other spooling to
+      stdout.  This proxy can be suppressed with the -n option, which
+      will result in EmPy being unable to do anything meaningful with
+      this output, but will allow EmPy to be threadsafe.</p></li>
+<li><p>To function properly, EmPy must override <code>sys.stdout</code> with a
+      proxy file object, so that it can capture output of side effects
+      and support diversions for each interpreter instance.  It is
+      important that code executed in an environment <em>not</em> rebind
+      <code>sys.stdout</code>, although it is perfectly legal to invoke it
+      explicitly (<em>e.g.</em>, <code>@sys.stdout.write("Hello world\n")</code>).  If
+      one really needs to access the "true" stdout, then use
+      <code>sys.__stdout__</code> instead (which should also not be rebound).
+      EmPy uses the standard Python error handlers when exceptions are
+      raised in EmPy code, which print to <code>sys.stderr</code>.</p></li>
+<li><p>Due to Python's curious handling of the <code>print</code> statement --
+      particularly the form with a trailing comma to suppress the
+      final newline -- mixing statement expansions using prints inline
+      with unexpanded text will often result in surprising behavior,
+      such as extraneous (sometimes even deferred!) spaces.  This is a
+      Python "feature," and occurs in non-EmPy applications as well;
+      for finer control over output formatting, use <code>sys.stdout.write</code>
+      or <code>empy.interpreter.write</code> directly.</p></li>
+<li><p>The <code>empy</code> "module" exposed through the EmPy interface (<em>e.g.</em>,
+      <code>@empy</code>) is an artificial module.  It cannot be imported with
+      the <code>import</code> statement (and shouldn't -- it is an artifact of
+      the EmPy processing system and does not correspond to any
+      accessible .py file).</p></li>
+<li><p>For an EmPy statement expansion all alone on a line, <em>e.g.</em>,
+      <code>@{a = 1}</code>, note that this will expand to a blank line due to
+      the newline following the closing curly brace.  To suppress this
+      blank line, use the symmetric convention <code>@{a = 1}@</code>.</p></li>
+<li><p>When using EmPy with make, note that partial output may be
+      created before an error occurs; this is a standard caveat when
+      using make.  To avoid this, write to a temporary file and move
+      when complete, delete the file in case of an error, use the -b
+      option to fully buffer output (including the open), or (with GNU
+      make) define a <code>.DELETE_ON_ERROR</code> target.</p></li>
+<li><p><code>empy.identify</code> tracks the context of executed <em>EmPy</em> code, not
+      Python code.  This means that blocks of code delimited with <code>@{</code>
+      and <code>}</code> will identify themselves as appearing on the line at
+      which the <code>}</code> appears, and that pure Python code executed via
+      the -D, -E and -F command line arguments will show up as all taking
+      place on line 1.  If you're tracking errors and want more
+      information about the location of the errors from the Python
+      code, use the -r command line option, which will provide you
+      with the full Python traceback.</p></li>
+<li><p>The conditional form of expression expansion <code>@(...?...!...)</code>
+      allows the use of a colon instead of an exclamation point,
+      <em>e.g.</em>, <code>@(...?...:...)</code>.  This behavior is supported for
+      backward compatibility, but is deprecated.  Due to an oversight,
+      the colon was a poor choice since colons can appear legally in
+      expressions (<em>e.g.</em>, dictionary literals or lambda expressions).</p></li>
+<li><p>The '@<a href="#reftry">[try]</a>' construct only works with Python exceptions derived
+      from <code>Exception</code>.  It is not able to catch string exceptions.</p></li>
+<li><p>The '@<a href="#reffor">[for]</a>' variable specification supports tuples for tuple
+      unpacking, even recursive tuples.  However, it is limited in
+      that the names included may only be valid Python identifiers,
+      not arbitrary Python lvalues.  Since the internal Python
+      mechanism is very rarely used for this purpose (<em>e.g.</em>, 'for (x,
+      l<a href="#ref0">[0]</a>, q.a) in sequence'), it is not thought to be a significant
+      limitation.</p></li>
+
+</ul>
+<h3>Wish list</h3>
+<p>    Here are some random ideas for future revisions of EmPy.  If any
+    of these are of particular interest to you, your input would be
+    appreciated.</p>
+
+<ul>
+<li><p>Some real-world examples should really be included for
+      demonstrating the power and expressiveness of EmPy first-hand.</p></li>
+<li><p>More extensive help (rather than a ridiculously long README),
+      probably inherently using the EmPy system itself for building to
+      HTML and other formats, thereby acting as a help facility and a
+      demonstration of the working system.</p></li>
+<li><p>A "trivial" mode, where all the EmPy system does is scan for
+      simple symbols to replace them with evaluations/executions,
+      rather than having to do the contextual scanning it does now.
+      This has the down side of being much less configurable and
+      powerful but the upside of being extremely efficient.</p></li>
+<li><p>A "debug" mode, where EmPy prints the contents of everything
+      it's about to evaluate (probably to stderr) before it does?</p></li>
+<li><p>The ability to funnel all code through a configurable <code>RExec</code>
+      for user-controlled security control.  This would probably
+      involve abstracting the execution functionality outside of the
+      interpreter.  [This suggestion is on hold until the
+      rexec/Bastion exploits are worked out.]</p></li>
+<li><p>Optimized handling of processing would be nice for the
+      possibility of an Apache module devoted to EmPy processing.</p></li>
+<li><p>An EmPy emacs mode.</p></li>
+<li><p>An optimization of offloading diversions to files when they
+      become truly huge.  (This is made possible by the abstraction of
+      the <code>Diversion</code> class.)</p></li>
+<li><p>Support for mapping filters (specified by dictionaries).</p></li>
+<li><p>Support for some sort of batch processing, where several EmPy
+      files can be listed at once and all of them evaluated with the
+      same initial (presumably expensive) environment.
+      <code>empy.saveGlobals</code> and <code>empy.restoreGlobals</code> have been
+      introduced as a partial solution, but they need to be made more
+      robust.</p></li>
+<li><p>A more elaborate interactive mode, perhaps with a prompt and
+      readline support.</p></li>
+<li><p>A StructuredText and/or reStructuredText filter would be quite
+      useful, as would SGML/HTML/XML/XHTML, s-expression, Python,
+      etc. auto-indenter filters.</p></li>
+<li><p>An indexing filter, which can process text and pick out
+      predefined keywords and thereby setup links to them.</p></li>
+<li><p>The ability to rerun diverted material back through the
+      interpreter.  (This can be done, awkwardly, by manually creating
+      a filter which itself contains an interpreter, but it might be
+      helpful if this was an all-in-one operation.)</p></li>
+<li><p>A caching system that stores off the compilations of repeated
+      evaluations and executions so that in a persistent environment
+      the same code does not have to be repeatedly evaluated/executed.
+      This would probably be a necessity in an Apache module-based
+      solution.  Perhaps caching even to the point of generating pure
+      PyWM bytecode?</p></li>
+<li><p>An option to change the format of the standard EmPy errors in a
+      traceback.</p></li>
+<li><p>Support for some manner of implicitly processed /etc/empyrc
+      and/or ~/.empyrc file, and of course an option to inhibit its
+      processing.  This can already be accomplished (and with greater
+      control) via use of EMPY_OPTIONS, though.</p></li>
+<li><p>More uniform handling of the preprocessing directives (-I, -D,
+      -E, -F, and -P), probably mapping directly to methods in the
+      <code>Interpreter</code> class.</p></li>
+<li><p>Support for integration with mod_python.</p></li>
+<li><p>In simple expressions, a <code>{...}</code> suffix has no meaning in Python
+      (<em>e.g.</em>, in Python, <code>@x(...)</code> is a call, <code>@x[...]</code> is
+      subscription, but <code>@x{...}</code> is illegal).  This could be
+      exploited by having a <code>{...}</code> suffix in a simple expression
+      representing an encapsulation of an expanded string; <em>e.g.</em>,
+      <code>@bullet{There are @count people here}</code> would be equivalent to
+      <code>@bullet(empy.expand("There are @count people here",
+      locals()))}</code>.</p></li>
+<li><p>A tool to collect significator information from a hierarchy of
+      .em files and put them in a database form available for
+      individual scripts would be extremely useful -- this tool should
+      be extensible so that users can use it to, say, build ordered
+      hierarchies of their EmPy files by detecting contextual
+      information like application-specific links to other EmPy
+      documents.</p></li>
+<li><p>Extensions of the basic EmPy concepts to projects for other
+      interpreted languages, such as Java, Lua, Ruby, and/or Perl.</p></li>
+<li><p>Ignore <code>SystemExit</code> when doing error handling, letting the
+      exception progagate up?  So far no one seems to worry about
+      this; deliberately exiting early in a template seems to be an
+      unlikely occurrence.  (Furthermore, there are the <code>os.abort</code> and
+      <code>os._exit</code> facilities for terminating without exception
+      propagation.)</p></li>
+<li><p>A new markup which is the equivalent of <code>$...:...$</code> in source
+      control systems, where the left-hand portion represents a
+      keyword and the right-hand portion represents its value which is
+      substituted in by the EmPy system.</p></li>
+<li><p>The ability to obtain the filename (if relevant) and mode of the
+      primary output file.</p></li>
+<li><p>The ability to redirect multiple streams of output; not
+      diversions, but rather the ability to write to one file and then
+      another.  Since output would be under the EmPy script's control,
+      this would imply a useful --no-output option, where by default
+      no output is written.  This would also suggest the usefulness of
+      all the output file delegates (diversions, filters, abstract
+      files, etc.) passing unrecognized method calls all the way down
+      to underlying file object.</p></li>
+<li><p>In addition to the em.py script, an additional support library
+      (non-executable) should be included which includes ancillary
+      functionality for more advanced features, but which is not
+      necessary to use EmPy in its basic form as a standalone
+      executable.  Such features would include things like
+      significator processing, metadata scanning, and advanced
+      prompting systems.</p></li>
+
+</ul>
+<h3>Release history</h3>
+
+<ul>
+<li><p>3.3.2; 2014 Jan 24.  Additional fix for source compatibility
+      between 2.x and 3.0.</p></li>
+<li><p>3.3.1; 2014 Jan 22.  Source compatibility for 2.x and 3.0;
+      1.x and Jython compatibility dropped.
+<li><p>3.3; 2003 Oct 27.  Custom markup '@<...>'; remove separate
+      pseudomodule instance for greater transparency; deprecate
+      <code>interpreter</code> attribute of pseudomodule; deprecate auxiliary
+      class name attributes associated with pseudomodule in
+      preparation for separate support library in 4.0; add
+      --no-callback-error and --no-bangpath-processing command line
+      options; add <code>atToken</code> hook.</p></li>
+<li><p>3.2; 2003 Oct 7.  Reengineer hooks support to use hook
+      instances; add -v option; add --relative-path option; reversed
+      PEP 317 style; modify Unicode support to give less confusing
+      errors in the case of unknown encodings and error handlers;
+      relicensed under LGPL.</p></li>
+<li><p>3.1.1; 2003 Sep 20.  Add literal <code>@"..."</code> markup; add
+      --pause-at-end command line option; fix improper globals
+      collision error via the <code>sys.stdout</code> proxy.</p></li>
+<li><p>3.1; 2003 Aug 8.  Unicode support (Python 2.0 and above); add
+      Document and Processor helper classes for processing
+      significators; add --no-prefix option for suppressing all
+      markups.</p></li>
+<li><p>3.0.4; 2003 Aug 7.  Implement somewhat more robust lvalue
+      parsing for '@<a href="#reffor">[for]</a>' construct (thanks to Beni Cherniavsky for
+      inspiration).</p></li>
+<li><p>3.0.3; 2003 Jul 9.  Fix bug regarding recursive tuple unpacking
+      using '@<a href="#reffor">[for]</a>'; add <code>empy.saveGlobals</code>, <code>empy.restoreGlobals</code>,
+      and <code>empy.defined</code> functions.</p></li>
+<li><p>3.0.2; 2003 Jun 19.  <code>@?</code> and <code>@!</code> markups for changing the
+      current context name and line, respectively; add <code>update</code> method
+      to interpreter; new and renamed context operations,
+      <code>empy.setContextName</code>, <code>empy.setContextLine</code>,
+      <code>empy.pushContext</code>, <code>empy.popContext</code>.</p></li>
+<li><p>3.0.1; 2003 Jun 9.  Fix simple bug preventing command line
+      preprocessing directives (-I, -D, -E, -F, -P) from executing
+      properly; defensive PEP 317 compliance <a href="#defunct"><a href="#refdefunct">[defunct]</a></a>.</p></li>
+<li><p>3.0; 2003 Jun 1.  Control markups with '@<a href="#ref...">[...]</a>'; remove
+      substitutions (use control markups instead); support
+      <code>@(...?...!...)</code> for conditional expressions in addition to the
+      now-deprecated <code>@(...?...:...)</code> variety; add acknowledgements
+      and glossary sections to documentation; rename buffering option
+      back to -b; add -m option and <code>EMPY_PSEUDO</code> environment variable
+      for changing the pseudomodule name; add -n option and
+      <code>EMPY_NO_OVERRIDE</code> environment variable for suppressing
+      <code>sys.stdout</code> proxy; rename main error class to 'Error'; add
+      standalone <code>expand</code> function; add --binary and --chunk-size
+      options; reengineer parsing system to use Tokens for easy
+      extensibility; safeguard curly braces in simple expressions
+      (meaningless in Python and thus likely a typographical error) by
+      making them a parse error; fix bug involving custom Interpreter
+      instances ignoring globals argument; distutils support.</p></li>
+<li><p>2.3; 2003 Feb 20.  Proper and full support for concurrent and
+      recursive interpreters; protection from closing the true stdout
+      file object; detect edge cases of interpreter globals or
+      <code>sys.stdout</code> proxy collisions; add globals manipulation
+      functions <code>empy.getGlobals</code>, <code>empy.setGlobals</code>, and
+      <code>empy.updateGlobals</code> which properly preserve the <code>empy</code>
+      pseudomodule; separate usage info out into easily accessible
+      lists for easier presentation; have -h option show simple usage
+      and -H show extened usage; add <code>NullFile</code> utility class.</p></li>
+<li><p>2.2.6; 2003 Jan 30.  Fix a bug in the <code>Filter.detach</code> method
+      (which would not normally be called anyway).</p></li>
+<li><p>2.2.5; 2003 Jan 9.  Strip carriage returns out of executed code
+      blocks for DOS/Windows compatibility.</p></li>
+<li><p>2.2.4; 2002 Dec 23.  Abstract Filter interface to use methods
+      only; add <code>@[noop: ...]</code> substitution for completeness and block
+      commenting <a href="#defunct"><a href="#refdefunct">[defunct]</a></a>.</p></li>
+<li><p>2.2.3; 2002 Dec 16.  Support compatibility with Jython by
+      working around a minor difference between CPython and Jython in
+      string splitting.</p></li>
+<li><p>2.2.2; 2002 Dec 14.  Include better docstrings for pseudomodule
+      functions; segue to a dictionary-based options system for
+      interpreters; add <code>empy.clearAllHooks</code> and 'empy.clearGlobals';
+      include a short documentation section on embedding interpreters;
+      fix a bug in significator regular expression.</p></li>
+<li><p>2.2.1; 2002 Nov 30.  Tweak test script to avoid writing
+      unnecessary temporary file; add <code>Interpreter.single</code> method;
+      expose <code>evaluate</code>, <code>execute</code>, <code>substitute</code> <a href="#defunct"><a href="#refdefunct">[defunct]</a></a>, and
+      <code>single</code> methods to the pseudomodule; add (rather obvious)
+      <code>EMPY_OPTIONS</code> environment variable support; add
+      <code>empy.enableHooks</code> and 'empy.disableHooks'; include optimization
+      to transparently disable hooks until they are actually used.</p></li>
+<li><p>2.2; 2002 Nov 21.  Switched to -V option for version
+      information; <code>empy.createDiversion</code> for creating initially empty
+      diversion; direct access to diversion objects with
+      'empy.retrieveDiversion'; environment variable support; removed
+      --raw long argument (use --raw-errors instead); added quaternary
+      escape code (well, why not).</p></li>
+<li><p>2.1; 2002 Oct 18.  <code>empy.atExit</code> registry separate from hooks to
+      allow for normal interpreter support; include a benchmark sample
+      and test.sh verification script; expose <code>empy.string</code> directly;
+      -D option for explicit defines on command line; remove
+      ill-conceived support for <code>@else:</code> separator in <code>@[if ...]</code>
+      substitution <a href="#defunct"><a href="#refdefunct">[defunct]</a></a> ; handle nested substitutions properly
+      <a href="#defunct"><a href="#refdefunct">[defunct]</a></a> ; <code>@[macro ...]</code> substitution for creating recallable
+      expansions <a href="#defunct"><a href="#refdefunct">[defunct]</a></a>.</p></li>
+<li><p>2.0.1; 2002 Oct 8.  Fix missing usage information; fix
+      after_evaluate hook not getting called; add <code>empy.atExit</code> call
+      to register values.</p></li>
+<li><p>2.0; 2002 Sep 30.  Parsing system completely revamped and
+      simplified, eliminating a whole class of context-related bugs;
+      builtin support for buffered filters; support for registering
+      hooks; support for command line arguments; interactive mode with
+      -i; significator value extended to be any valid Python
+      expression.</p></li>
+<li><p>1.5.1; 2002 Sep 24.  Allow <code>@]</code> to represent unbalanced close
+      brackets in <code>@[...]</code> markups <a href="#defunct"><a href="#refdefunct">[defunct]</a></a>.</p></li>
+<li><p>1.5; 2002 Sep 18.  Escape codes (<code>@\...</code>); conditional and
+      repeated expansion substitutions <a href="#defunct"><a href="#refdefunct">[defunct]</a></a> ; replaced with control
+      markups]; fix a few bugs involving files which do not end in
+      newlines.</p></li>
+<li><p>1.4; 2002 Sep 7.  Fix bug with triple quotes; collapse
+      conditional and protected expression syntaxes into the single
+      generalized <code>@(...)</code> notation; <code>empy.setName</code> and <code>empy.setLine</code>
+      functions <a href="#deprecated"><a href="#refdeprecated">[deprecated]</a></a> ; true support for multiple concurrent
+      interpreters with improved sys.stdout proxy; proper support for
+      <code>empy.expand</code> to return a string evaluated in a subinterpreter
+      as intended; merged Context and Parser classes together, and
+      separated out Scanner functionality.</p></li>
+<li><p>1.3; 2002 Aug 24.  Pseudomodule as true instance; move toward
+      more verbose (and clear) pseudomodule functions; fleshed out
+      diversion model; filters; conditional expressions; protected
+      expressions; preprocessing with -P (in preparation for
+      possible support for command line arguments).</p></li>
+<li><p>1.2; 2002 Aug 16.  Treat bangpaths as comments; <code>empy.quote</code> for
+      the opposite process of 'empy.expand'; significators (<code>@%...</code>
+      sequences); -I option; -f option; much improved documentation.</p></li>
+<li><p>1.1.5; 2002 Aug 15.  Add a separate <code>invoke</code> function that can be
+      called multiple times with arguments to simulate multiple runs.</p></li>
+<li><p>1.1.4; 2002 Aug 12.  Handle strings thrown as exceptions
+      properly; use getopt to process command line arguments; cleanup
+      file buffering with AbstractFile; very slight documentation and
+      code cleanup.</p></li>
+<li><p>1.1.3; 2002 Aug 9.  Support for changing the prefix from within
+      the <code>empy</code> pseudomodule.</p></li>
+<li><p>1.1.2; 2002 Aug 5.  Renamed buffering option <a href="#defunct"><a href="#refdefunct">[defunct]</a></a>, added -F
+      option for interpreting Python files from the command line,
+      fixed improper handling of exceptions from command line options
+      (-E, -F).</p></li>
+<li><p>1.1.1; 2002 Aug 4.  Typo bugfixes; documentation clarification.</p></li>
+<li><p>1.1; 2002 Aug 4.  Added option for fully buffering output
+      (including file opens), executing commands through the command
+      line; some documentation errors fixed.</p></li>
+<li><p>1.0; 2002 Jul 23.  Renamed project to EmPy.  Documentation and
+      sample tweaks; added <code>empy.flatten</code>.  Added -a option.</p></li>
+<li><p>0.3; 2002 Apr 14.  Extended "simple expression" syntax,
+      interpreter abstraction, proper context handling, better error
+      handling, explicit file inclusion, extended samples.</p></li>
+<li><p>0.2; 2002 Apr 13.  Bugfixes, support non-expansion of Nones,
+      allow choice of alternate prefix.</p></li>
+<li><p>0.1.1; 2002 Apr 12.  Bugfixes, support for Python 1.5.x, add -r
+      option.</p></li>
+<li><p>0.1; 2002 Apr 12.  Initial early access release.</p></li>
+
+</ul>
+<h3>Author</h3>
+<p>    This module was written by <a href="http://www.alcyone.com/max/">Erik Max Francis</a>.  If you use this software, have
+    suggestions for future releases, or bug reports, <a href="mailto:software@alcyone.com">I'd love to hear
+    about it</a>.</p>
+<p>    Even if you try out EmPy for a project and find it unsuitable, I'd
+    like to know what stumbling blocks you ran into so they can
+    potentially be addressed in a future version.</p>
+<h3>Version</h3>
+<p>    Version 3.3.2 $Date: 2004-01-25 $ $Author: max $</p>
+<table border="0" cellpadding="5" cellspacing="0" width="100%">
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="Modules and Packages">Modules and Packages</a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+<table border="0" cellpadding="3" cellspacing="0">
+<tr><td valign="top" align="left"><p><a href="home/max/projects/empy/doc/em.html">em</a></p></td><td valign="top" align="left">
+<p>A system for processing Python as markup embedded in text.</p>
+</td></tr>
+</table>
+</td></tr>
+</table>
+
+        </td>
+        </tr>
+        </table>
+
+        <hr>
+
+        <p><i><a href="index.html">Table of Contents</a></i></p>
+
+        <font size="-2"><i>This document was automatically generated
+        on Wed Jan 22 00:00:00 2014 by
+        <a href="http://happydoc.sourceforge.net">HappyDoc</a> version
+        2.1</i></font>
+        
+        </body>
+        </html>
+        

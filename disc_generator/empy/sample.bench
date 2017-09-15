@@ -1,0 +1,164 @@
+#! This line however will appear (not the first line in the script).
+This is text.  It should appear in the processed output. 
+This is a literal at sign: @.
+This is a line continuation; this will appear on the same line.
+Note that it will actually eat any whitespace (one word).
+
+This will appear on one line.
+This will appear on a separate line.
+This is separated by a tab:	See?
+These are uppercase As (presuming ASCII): A, A, A, A, A.
+This is more text.
+
+The basics: The square of 4 is 16, or 16.
+Internal whitespace is fine: 4 squared is 16.
+Statements: 4**2 = 16.
+Whitespace too: 4**2 = 16 (still).
+But only on single-line statement expansions.
+Internal whitespace on multi-line statements is significant.
+Normal Python indentation rules must be followed here.
+Normal Python indentation rules must be followed here.
+Simple expressions: x is 4, l is [3, 2, 1], s is "alpha," and 4 squared is 16.
+Literals too: x is 4, but would be written @x.
+Trailing dots are ignored: The value of x is 4.
+Quotes outside of expansions are also ignored: This is quoted: "x is 4."
+Array subscription: The first element of l is 3.
+But this is not: The first element of l is not [3, 2, 1] [0].
+That was equivalent to: [3, 2, 1] and then [0], not 3.
+But whitespace can go inside the brackets: 3 is 3.
+Same with functions: 16 is 16.
+The same applies to the other forms.
+Involved: The contained value is 3.
+More involved: The square of the contained value is 9.
+Following expressions: Pluralize "book" as "books," or maybe "books."
+By default str is used (alpha), but you can use repr if you want ('alpha').
+Conditional expressions: x is true.
+Pluralization: How many words? 4 words.
+Protected expressions: foo is not defined.
+Also here, whitespace isn't important: bar isn't defined either.
+The math module has been imported.
+The re module has not been imported.
+Division by zero is illegal.
+To swallow errors, use None:  [two spaces].
+This is self-expanding: @:2 + 2:4:
+You can expand multiple times: @:2 + 2:4:
+
+c's class is C.
+c's name is empy.
+Method call: Hello, empy.
+Note that None is not expanded:  [two spaces].
+But the string 'None' is, of course, printed fine: None.
+So a function can return None for side effects only: Hello, empy.
+
+If: a is positive.
+If/else: b is negative.
+If/elif/else: cmp(a, b) is positive.
+Numbers: 0 1 2 3 4 5 6 7 8 9.
+Evens: 0 2 4 6 8.
+Integers less than 5: 0 1 2 3 4.
+Countdown: 10 9 8 7 6 5 4 3 2 1 0.
+While/else: works.
+For/else: 0 1 2 also works.
+Tuple unpacking: <1> <2> <3> <4>.
+Tuple unpacking: <1> <2> <3> <4>.
+Tuple unpacking: <1> <2> <3> <4>.
+Tuple unpacking: <1, 2> <3, 4>.
+Tuple unpacking: <1, 2> <3, 4>.
+Tuple unpacking: <1, 2> <3, 4>.
+Tuple unpacking: <1, 2> <3, 4>.
+Tuple unpacking: <1, 2> <3, 4>.
+Tuple unpacking: <1, 2> <3, 4>.
+Tuple unpacking: <1, 2> <3, 4>.
+Tuple unpacking: <1, 2> <3, 4>.
+More tuple unpacking: <1, 2> <3, 4>.
+Garbage is not defined.
+Division by zero is illegal.
+Catch all: something happened.
+Finally works: finally, and caught.
+Define: 5 is positive, -3 is negative, 0 is zero.
+
+A. This text is undiverted.
+B. This text is also undiverted.
+C. This text is diverted.
+D. Again, this text is undiverted.
+E. This text is diverted and then undiverted.
+E. This text is diverted and then undiverted (this should appear twice).
+F. This text is diverted and then cancelled.
+G. This text is again undiverted.
+H. There should be one remaining diversion: ['x'].
+I. But not after purging it: [].
+J. This should be the final diversion, created manually.
+
+Blanks: , , , .
+Single quotes: ', ', '.
+Double quotes: ", ", ".
+Triple quotes: """, """, ''', '''.
+Quotes surrounded by spaces:  " ,  ' .
+At signs: @, @, @, @.
+Close parentheses: ), ), ), ).
+Close parentheses in quotes: ')', ')'.
+Close braces with an intervening space: } }.
+Repr of a backquote: '`'.
+Exes: x, x, x, x, x.
+Dollar signs: $, $, $.
+These are strings:
+single quoted string
+double quoted string
+single quoted string with escaped 'single quotes'
+double quoted string with escaped "double quotes"
+triple single quoted string
+triple double quoted string
+single quoted string with "double quotes"
+double quoted string with 'single quotes'
+triple single quoted continued string
+triple double quoted continued string
+triple single quoted
+...multi-line string
+triple double quoted
+... multi-line string
+
+Encountered significators:
+a and b should be None: None, None
+c and d should be 'x': 'x', 'x'
+e and f should be 'x y': 'x y', 'x y'
+
+This line should be in mixed case.
+this line should be all lowercase.
+THIS LINE SHOULD BE ALL UPPERCASE (HOW GAUCHE).
+[This line should be bracketed.]
+[So should this line.]
+*There* shou*ld be* star*s eve*ry fi*ve ch*aract*ers o*n thi*s lin*e.
+This line should be back to mixed case.
+[THIS LINE SHOULD BE ALL UPPERCASE WITH BRACKETS.]
+This line should be back to mixed case (again).
+
+The new context is sample.em:264.
+File inclusion [sample.em:265]: 2 + 2 = 4 [<<class 'FakeFile'>>:1].
+Expansion [sample.em:266]: This should be appear [<expand>:1] on the same line as this [sample.em:268].
+More expansion [sample.em:269]: Another expansion [<expand>:1].
+This is the next line [sample.em:271].
+Quoting: x when quoted would be '@x' or @@x.
+More quoting: This will be @@doubled but '''@this is not'''.
+Here's the last view of the old context: sample.em:274.
+Creating a new context ...
+The current context is: <unnamed>:1.
+The context name should now be 'NewName': NewName:3.
+The line number should now be 1000: NewName:1000.
+Back to the old context: sample.em:277.
+
+Interpreter's q is 1.
+Embedded interpreter's q is 10.
+Interpreter's q is still 1; the embedded interpreter had no effect.
+Standalone expansion: 1 + 1 is 2.
+With locals: 2 + 3 is 5.
+With globals: g's x is 10.
+Still with globals: g's x + 1 is 11.
+g's x is still 10.
+
+Invoking the sample hook: [SampleHook.null invoked].
+
+Using a custom markup: [This appears in brackets].
+Again: [<There are angle brackets in this one>].
+Once more: [This is a right angle bracket in quotes: ">"].
+
+This is the penultimate line.
