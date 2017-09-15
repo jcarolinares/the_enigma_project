@@ -1,3 +1,5 @@
+#PROBLEMAS DE FUNCIONAMIENTO EN LA GENERACION DE DISCOS ENIGMA
+
 import em
 
 number_of_discs=input("Please enter the number of discs:\n")

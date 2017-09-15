@@ -87,7 +87,7 @@ crypt[19]="l";
 crypt[20]="v";
 crypt[21]="g";
 crypt[22]="x";
-crypt[19]="l";
+crypt[23]="l";
 crypt[24]="o";
 crypt[25]="y";
 
