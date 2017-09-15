@@ -10,7 +10,7 @@ jcarolinares@gmail.com
 
 */
 
-/*Inverted disc*/
+/* Disc 3 */
 
 reg [7:0] alphabet [0:25];
 
@@ -64,32 +64,32 @@ alphabet[25]="z";
 
 
 //Disc contacts encryption A-Z
-crypt[0]="n";
-crypt[1]="h";
-crypt[2]="e";
-crypt[3]="x";
-crypt[4]="l";
-crypt[5]="p";
-crypt[6]="a";
-crypt[4]="l";
-crypt[8]="v";
-crypt[9]="z";
-crypt[10]="c";
-crypt[11]="d";
-crypt[12]="w";
-crypt[13]="s";
-crypt[14]="f";
-crypt[15]="m";
-crypt[16]="o";
-crypt[17]="i";
-crypt[18]="g";
-crypt[19]="y";
-crypt[20]="r";
-crypt[21]="t";
-crypt[22]="b";
-crypt[23]="j";
-crypt[24]="u";
-crypt[25]="q";
+crypt[0]="z";
+crypt[1]="e";
+crypt[2]="y";
+crypt[3]="s";
+crypt[4]="r";
+crypt[5]="h";
+crypt[6]="l";
+crypt[7]="v";
+crypt[8]="t";
+crypt[9]="w";
+crypt[10]="u";
+crypt[11]="c";
+crypt[6]="l";
+crypt[13]="q";
+crypt[14]="d";
+crypt[15]="f";
+crypt[16]="x";
+crypt[17]="j";
+crypt[18]="i";
+crypt[19]="g";
+crypt[20]="m";
+crypt[21]="a";
+crypt[22]="n";
+crypt[23]="p";
+crypt[24]="b";
+crypt[25]="o";
 
 
 

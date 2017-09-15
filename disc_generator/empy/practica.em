@@ -27,8 +27,3 @@ Numeros @"\n"
 
 //Disc contacts encryption A-Z
 @[for i in letters]@ crypt[@letters.index(i)]="@i";@"\n"@[end for]
-
-
-@#Prueba alfabeto aleatorio
-
-@letters

@@ -2,6 +2,7 @@
 @# Encryption alphabet generator @
 @{
 import random
+disc_n=empy.argv[0]
 letters=["a","b","c","d","e","f","g","h","i","j","l","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
 random.shuffle(letters)
 }@
@@ -17,7 +18,7 @@ jcarolinares@@gmail.com
 
 */
 
-/*Disc*/
+/* Disc @(disc_n) */
 
 reg [7:0] alphabet [0:25];
 
