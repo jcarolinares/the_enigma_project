@@ -287,7 +287,7 @@
           "id": "78a53bf3-ebff-4660-8f7a-f2ecca5038a8",
           "type": "basic.code",
           "data": {
-            "code": "//Counter\n\nreg value;\nreg _ow;\n\nalways @(posedge cnt) begin\n\n    if (rst==1)\n        begin\n            value<=8'b0000_0000;\n            _ow<=1;\n        end\n    else\n        begin\n            value<=value+1;\n            _ow<=0;\n       end\n\nend\n\nassign ow=_ow;\n\n\n//assign ow=c_down;",
+            "code": "//Counter\n\nreg value;\nreg _ow;\n\n//TODO value equals to M at the beggining\n\nalways @(posedge cnt) begin\n\n    if (rst==1)\n        begin\n            value<=8'b0000_0000;\n            _ow<=1;\n        end\n    else\n        begin\n            value<=value+1;\n            _ow<=0;\n       end\n\nend\n\nassign ow=_ow;\n\n\n//assign ow=c_down;",
             "params": [],
             "ports": {
               "in": [
