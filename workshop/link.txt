@@ -1,8 +1,0 @@
-Icestudio: https://github.com/FPGAwars/icestudio
-Scriptcommunicator: https://github.com/szieke/ScriptCommunicator_serial-terminal
-Colección Jedi de bloques Icestudio: https://github.com/FPGAwars/Collection-Jedi
-Repositorio máquina enigma: https://github.com/jcarolinares/the_enigma_project
-
-
-
-
