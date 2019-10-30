@@ -1,8 +1,8 @@
 {
   "version": "1.2",
   "package": {
-    "name": "",
-    "version": "",
+    "name": "Led on",
+    "version": "1.0.0",
     "description": "",
     "author": "",
     "image": ""
@@ -12,10 +12,10 @@
     "graph": {
       "blocks": [
         {
-          "id": "18a7d8e6-78d4-4f1f-bfcb-b4b2816dde6a",
+          "id": "949075cb-26c0-49da-ba76-2496ea9aa7cc",
           "type": "basic.output",
           "data": {
-            "name": "led",
+            "name": "LED",
             "pins": [
               {
                 "index": "0",
@@ -26,69 +26,47 @@
             "virtual": false
           },
           "position": {
-            "x": 1080,
-            "y": 256
+            "x": 336,
+            "y": 136
           }
         },
         {
-          "id": "838008eb-196c-4414-9926-a1f9598c93bc",
-          "type": "c83dcd1d9ab420d911df81b3dfae04681559c623",
+          "id": "a538a5b4-d5d5-4ace-a593-efb1fa9b930c",
+          "type": "basic.info",
+          "data": {
+            "info": "Turn on a LED",
+            "readonly": true
+          },
           "position": {
-            "x": 104,
-            "y": 256
+            "x": 80,
+            "y": 48
+          },
+          "size": {
+            "width": 128,
+            "height": 32
+          }
+        },
+        {
+          "id": "eaf792b5-de98-4e2f-b78a-4023eb9a7f2b",
+          "type": "3e6c249e205080168c1bf4ee8dbc33b50653d5f4",
+          "position": {
+            "x": 80,
+            "y": 136
           },
           "size": {
             "width": 96,
             "height": 64
-          }
-        },
-        {
-          "id": "19b5d4f1-3164-44e4-802d-436230808fd0",
-          "type": "basic.code",
-          "data": {
-            "code": "/*\n\nA circuit can be:\n\n* Combinational->The outputs dependes of the inputs\n\n* Sequential -> The outputs depends of the inputs and previous states\n\n*/\n\n\n// Let's say the output has a 1 value\n// assign output_bit=1;\n\n// We assign the output directly the input\nassign output_bit=input_bit;\n",
-            "params": [],
-            "ports": {
-              "in": [
-                {
-                  "name": "input_bit"
-                }
-              ],
-              "out": [
-                {
-                  "name": "output_bit"
-                }
-              ]
-            }
-          },
-          "position": {
-            "x": 392,
-            "y": 136
-          },
-          "size": {
-            "width": 560,
-            "height": 304
           }
         }
       ],
       "wires": [
         {
           "source": {
-            "block": "838008eb-196c-4414-9926-a1f9598c93bc",
+            "block": "eaf792b5-de98-4e2f-b78a-4023eb9a7f2b",
             "port": "19c8f68d-5022-487f-9ab0-f0a3cd58bead"
           },
           "target": {
-            "block": "19b5d4f1-3164-44e4-802d-436230808fd0",
-            "port": "input_bit"
-          }
-        },
-        {
-          "source": {
-            "block": "19b5d4f1-3164-44e4-802d-436230808fd0",
-            "port": "output_bit"
-          },
-          "target": {
-            "block": "18a7d8e6-78d4-4f1f-bfcb-b4b2816dde6a",
+            "block": "949075cb-26c0-49da-ba76-2496ea9aa7cc",
             "port": "in"
           }
         }
@@ -96,7 +74,7 @@
     }
   },
   "dependencies": {
-    "c83dcd1d9ab420d911df81b3dfae04681559c623": {
+    "3e6c249e205080168c1bf4ee8dbc33b50653d5f4": {
       "package": {
         "name": "Bit 1",
         "version": "1.0.0",
@@ -107,17 +85,6 @@
       "design": {
         "graph": {
           "blocks": [
-            {
-              "id": "19c8f68d-5022-487f-9ab0-f0a3cd58bead",
-              "type": "basic.output",
-              "data": {
-                "name": ""
-              },
-              "position": {
-                "x": 608,
-                "y": 192
-              }
-            },
             {
               "id": "b959fb96-ac67-4aea-90b3-ed35a4c17bf5",
               "type": "basic.code",
@@ -136,10 +103,17 @@
               "position": {
                 "x": 96,
                 "y": 96
+              }
+            },
+            {
+              "id": "19c8f68d-5022-487f-9ab0-f0a3cd58bead",
+              "type": "basic.output",
+              "data": {
+                "name": ""
               },
-              "size": {
-                "width": 384,
-                "height": 256
+              "position": {
+                "x": 608,
+                "y": 192
               }
             }
           ],

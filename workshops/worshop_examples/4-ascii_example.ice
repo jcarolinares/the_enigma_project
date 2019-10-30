@@ -71,7 +71,7 @@
           "type": "basic.constant",
           "data": {
             "name": "letter",
-            "value": "0010_0001",
+            "value": "0100_0001",
             "local": false
           },
           "position": {
