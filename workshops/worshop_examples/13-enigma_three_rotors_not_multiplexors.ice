@@ -32,25 +32,6 @@
           }
         },
         {
-          "id": "9138f647-cc36-499f-9a51-fa7ae9af67d6",
-          "type": "basic.output",
-          "data": {
-            "name": "Serial",
-            "pins": [
-              {
-                "index": "0",
-                "name": "TX",
-                "value": "8"
-              }
-            ],
-            "virtual": false
-          },
-          "position": {
-            "x": 960,
-            "y": 88
-          }
-        },
-        {
           "id": "39ff41db-26b6-4c57-870e-d698d2b17b66",
           "type": "basic.input",
           "data": {
@@ -68,6 +49,25 @@
           "position": {
             "x": -608,
             "y": 320
+          }
+        },
+        {
+          "id": "9138f647-cc36-499f-9a51-fa7ae9af67d6",
+          "type": "basic.output",
+          "data": {
+            "name": "Serial",
+            "pins": [
+              {
+                "index": "0",
+                "name": "TX",
+                "value": "8"
+              }
+            ],
+            "virtual": false
+          },
+          "position": {
+            "x": 2528,
+            "y": 472
           }
         },
         {
@@ -238,8 +238,8 @@
           "id": "09b2c72f-4745-424f-9d74-647334648eaa",
           "type": "c6459cf10c1547cd019a1270349def563247dd01",
           "position": {
-            "x": 752,
-            "y": 104
+            "x": 2320,
+            "y": 488
           },
           "size": {
             "width": 96,
@@ -250,7 +250,7 @@
           "id": "48601cbd-ae23-4dad-9815-42c90ab1d7db",
           "type": "basic.code",
           "data": {
-            "code": "/* Enigma machine one rotor\n\nCreated by Julián Caro Linares\n\njcarolinares@gmail.com\n\n\"A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z.\"\n\n*/\n\n/*Example 1*/\n\nreg [7:0] alphabet [0:25];\nreg [7:0] in_letter [0:25]; // Input contacts, it changes depending of the mode\nreg [7:0] crypt [0:25]; // Encryption disc- To make a new disc, change the values of this memory\nreg [7:0] out_letter [0:25]; // Output contacs, it changes depending of the mode\n\nreg [7:0] _out;\ninteger i=0; //For loop integer counter\n\n\nalways @(*) begin\n\n//Alphabet/Symbols declaration and encrypted symbols\nalphabet[0]=\"a\";  crypt[0]=\"j\";\nalphabet[1]=\"b\";  crypt[1]=\"k\";\nalphabet[2]=\"c\";  crypt[2]=\"q\";\nalphabet[3]=\"d\";  crypt[3]=\"u\";\nalphabet[4]=\"e\";  crypt[4]=\"l\";\nalphabet[5]=\"f\";  crypt[5]=\"m\";\nalphabet[6]=\"g\";  crypt[6]=\"r\";\nalphabet[7]=\"h\";  crypt[7]=\"t\";\nalphabet[8]=\"i\";  crypt[8]=\"b\";\nalphabet[9]=\"j\";  crypt[9]=\"a\";\nalphabet[10]=\"k\"; crypt[10]=\"s\";\nalphabet[11]=\"l\"; crypt[11]=\"d\";\nalphabet[12]=\"m\"; crypt[12]=\"c\";\nalphabet[13]=\"n\"; crypt[13]=\"o\";\nalphabet[14]=\"o\"; crypt[14]=\"v\";\nalphabet[15]=\"p\"; crypt[15]=\"p\";\nalphabet[16]=\"q\"; crypt[16]=\"n\";\nalphabet[17]=\"r\"; crypt[17]=\"w\";\nalphabet[18]=\"s\"; crypt[18]=\"e\";\nalphabet[19]=\"t\"; crypt[19]=\"x\";\nalphabet[20]=\"u\"; crypt[20]=\"z\";\nalphabet[21]=\"v\"; crypt[21]=\"y\";\nalphabet[22]=\"w\"; crypt[22]=\"f\";\nalphabet[23]=\"x\"; crypt[23]=\"i\";\nalphabet[24]=\"y\"; crypt[24]=\"h\";\nalphabet[25]=\"z\"; crypt[25]=\"g\";\n\n\n//Position between Encrypted disc and external positions contacts.\nfor (i=0; i<26;i=i+1)\n    begin\n        if (mode==0) begin\n            in_letter[i]<=alphabet[i];\n            out_letter[i]<=crypt[i];\n        end\n        else begin\n            in_letter[i]<=crypt[i];\n            out_letter[i]<=alphabet[i];\n        end\n    end\n\n\n//Conection between contacts\n\n    case(letter)\n        in_letter[0]: _out = out_letter[0];\n        in_letter[1]: _out = out_letter[1];\n        in_letter[2]: _out = out_letter[2];\n        in_letter[3]: _out = out_letter[3];\n        in_letter[4]: _out = out_letter[4];\n        in_letter[5]: _out = out_letter[5];\n        in_letter[6]: _out = out_letter[6];\n        in_letter[7]: _out = out_letter[7];\n        in_letter[8]: _out = out_letter[8];\n        in_letter[9]: _out = out_letter[9];\n        in_letter[10]: _out = out_letter[10];\n        in_letter[11]: _out = out_letter[11];\n        in_letter[12]: _out = out_letter[12];\n        in_letter[13]: _out = out_letter[13];\n        in_letter[14]: _out = out_letter[14];\n        in_letter[15]: _out = out_letter[15];\n        in_letter[16]: _out = out_letter[16];\n        in_letter[17]: _out = out_letter[17];\n        in_letter[18]: _out = out_letter[18];\n        in_letter[19]: _out = out_letter[19];\n        in_letter[20]: _out = out_letter[20];\n        in_letter[21]: _out = out_letter[21];\n        in_letter[22]: _out = out_letter[22];\n        in_letter[23]: _out = out_letter[23];\n        in_letter[24]: _out = out_letter[24];\n        in_letter[25]: _out = out_letter[25];\n                \n        \" \": _out = \" \";\n        \n        default: _out = 8'b0000_0000;\n    endcase\nend\n\nassign letter_out = _out;",
+            "code": "/*Caesar Cypher\n\nCreated by Julián Caro Linares\n\njcarolinares@gmail.com\n\n\"A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z.\"\n\n*/\n\n/*Example 1*/\n\nreg [7:0] alphabet [0:25];\nreg [7:0] in_letter [0:25]; // Input contacts, it changes depending of the mode\nreg [7:0] crypt [0:25]; // Encryption disc- To make a new disc, change the values of this memory\nreg [7:0] out_letter [0:25]; // Output contacs, it changes depending of the mode\n\nreg [7:0] _out;\ninteger i=0; //For loop integer counter\n\n\nalways @(*) begin\n\n//Alphabet/Symbols declaration and encrypted symbols\nalphabet[0]=\"a\";  crypt[0]=\"j\";\nalphabet[1]=\"b\";  crypt[1]=\"k\";\nalphabet[2]=\"c\";  crypt[2]=\"q\";\nalphabet[3]=\"d\";  crypt[3]=\"u\";\nalphabet[4]=\"e\";  crypt[4]=\"l\";\nalphabet[5]=\"f\";  crypt[5]=\"m\";\nalphabet[6]=\"g\";  crypt[6]=\"r\";\nalphabet[7]=\"h\";  crypt[7]=\"t\";\nalphabet[8]=\"i\";  crypt[8]=\"b\";\nalphabet[9]=\"j\";  crypt[9]=\"a\";\nalphabet[10]=\"k\"; crypt[10]=\"s\";\nalphabet[11]=\"l\"; crypt[11]=\"d\";\nalphabet[12]=\"m\"; crypt[12]=\"c\";\nalphabet[13]=\"n\"; crypt[13]=\"o\";\nalphabet[14]=\"o\"; crypt[14]=\"v\";\nalphabet[15]=\"p\"; crypt[15]=\"p\";\nalphabet[16]=\"q\"; crypt[16]=\"n\";\nalphabet[17]=\"r\"; crypt[17]=\"w\";\nalphabet[18]=\"s\"; crypt[18]=\"e\";\nalphabet[19]=\"t\"; crypt[19]=\"x\";\nalphabet[20]=\"u\"; crypt[20]=\"z\";\nalphabet[21]=\"v\"; crypt[21]=\"y\";\nalphabet[22]=\"w\"; crypt[22]=\"f\";\nalphabet[23]=\"x\"; crypt[23]=\"i\";\nalphabet[24]=\"y\"; crypt[24]=\"h\";\nalphabet[25]=\"z\"; crypt[25]=\"g\";\n\n\n//Position between Encrypted disc and external positions contacts.\nfor (i=0; i<26;i=i+1)\n    begin\n        if (mode==0) begin\n            in_letter[i]<=alphabet[i];\n            out_letter[i]<=crypt[i];\n        end\n        else begin\n            in_letter[i]<=crypt[i];\n            out_letter[i]<=alphabet[i];\n        end\n    end\n\n\n//Conection between contacts\n\n    case(letter)\n        in_letter[0]: _out = out_letter[0];\n        in_letter[1]: _out = out_letter[1];\n        in_letter[2]: _out = out_letter[2];\n        in_letter[3]: _out = out_letter[3];\n        in_letter[4]: _out = out_letter[4];\n        in_letter[5]: _out = out_letter[5];\n        in_letter[6]: _out = out_letter[6];\n        in_letter[7]: _out = out_letter[7];\n        in_letter[8]: _out = out_letter[8];\n        in_letter[9]: _out = out_letter[9];\n        in_letter[10]: _out = out_letter[10];\n        in_letter[11]: _out = out_letter[11];\n        in_letter[12]: _out = out_letter[12];\n        in_letter[13]: _out = out_letter[13];\n        in_letter[14]: _out = out_letter[14];\n        in_letter[15]: _out = out_letter[15];\n        in_letter[16]: _out = out_letter[16];\n        in_letter[17]: _out = out_letter[17];\n        in_letter[18]: _out = out_letter[18];\n        in_letter[19]: _out = out_letter[19];\n        in_letter[20]: _out = out_letter[20];\n        in_letter[21]: _out = out_letter[21];\n        in_letter[22]: _out = out_letter[22];\n        in_letter[23]: _out = out_letter[23];\n        in_letter[24]: _out = out_letter[24];\n        in_letter[25]: _out = out_letter[25];\n                \n        \" \": _out = \" \";\n        \n        default: _out = 8'b0000_0000;\n    endcase\nend\n\nassign letter_out = _out;",
             "params": [],
             "ports": {
               "in": [
@@ -291,6 +291,76 @@
           "size": {
             "width": 96,
             "height": 64
+          }
+        },
+        {
+          "id": "2efd6c53-a8ce-424f-869e-ab1e9d75417c",
+          "type": "basic.code",
+          "data": {
+            "code": "/*Caesar Cypher\n\nCreated by Julián Caro Linares\n\njcarolinares@gmail.com\n\n\"A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z.\"\n\n*/\n\n/*Example 1*/\n\nreg [7:0] alphabet [0:25];\nreg [7:0] in_letter [0:25]; // Input contacts, it changes depending of the mode\nreg [7:0] crypt [0:25]; // Encryption disc- To make a new disc, change the values of this memory\nreg [7:0] out_letter [0:25]; // Output contacs, it changes depending of the mode\n\nreg [7:0] _out;\ninteger i=0; //For loop integer counter\n\n\nalways @(*) begin\n\n//Alphabet/Symbols declaration and encrypted symbols\nalphabet[0]=\"a\";  crypt[0]=\"a\";\nalphabet[1]=\"b\";  crypt[1]=\"i\";\nalphabet[2]=\"c\";  crypt[2]=\"y\";\nalphabet[3]=\"d\";  crypt[3]=\"z\";\nalphabet[4]=\"e\";  crypt[4]=\"v\";\nalphabet[5]=\"f\";  crypt[5]=\"u\";\nalphabet[6]=\"g\";  crypt[6]=\"j\";\nalphabet[7]=\"h\";  crypt[7]=\"t\";\nalphabet[8]=\"i\";  crypt[8]=\"k\";\nalphabet[9]=\"j\";  crypt[9]=\"s\";\nalphabet[10]=\"k\"; crypt[10]=\"d\";\nalphabet[11]=\"l\"; crypt[11]=\"e\";\nalphabet[12]=\"m\"; crypt[12]=\"r\";\nalphabet[13]=\"n\"; crypt[13]=\"q\";\nalphabet[14]=\"o\"; crypt[14]=\"l\";\nalphabet[15]=\"p\"; crypt[15]=\"c\";\nalphabet[16]=\"q\"; crypt[16]=\"m\";\nalphabet[17]=\"r\"; crypt[17]=\"x\";\nalphabet[18]=\"s\"; crypt[18]=\"w\";\nalphabet[19]=\"t\"; crypt[19]=\"p\";\nalphabet[20]=\"u\"; crypt[20]=\"b\";\nalphabet[21]=\"v\"; crypt[21]=\"h\";\nalphabet[22]=\"w\"; crypt[22]=\"n\";\nalphabet[23]=\"x\"; crypt[23]=\"g\";\nalphabet[24]=\"y\"; crypt[24]=\"f\";\nalphabet[25]=\"z\"; crypt[25]=\"o\";\n\n\n//Position between Encrypted disc and external positions contacts.\nfor (i=0; i<26;i=i+1)\n    begin\n        if (mode==0) begin\n            in_letter[i]<=alphabet[i];\n            out_letter[i]<=crypt[i];\n        end\n        else begin\n            in_letter[i]<=crypt[i];\n            out_letter[i]<=alphabet[i];\n        end\n    end\n\n\n//Conection between contacts\n\n    case(letter)\n        in_letter[0]: _out = out_letter[0];\n        in_letter[1]: _out = out_letter[1];\n        in_letter[2]: _out = out_letter[2];\n        in_letter[3]: _out = out_letter[3];\n        in_letter[4]: _out = out_letter[4];\n        in_letter[5]: _out = out_letter[5];\n        in_letter[6]: _out = out_letter[6];\n        in_letter[7]: _out = out_letter[7];\n        in_letter[8]: _out = out_letter[8];\n        in_letter[9]: _out = out_letter[9];\n        in_letter[10]: _out = out_letter[10];\n        in_letter[11]: _out = out_letter[11];\n        in_letter[12]: _out = out_letter[12];\n        in_letter[13]: _out = out_letter[13];\n        in_letter[14]: _out = out_letter[14];\n        in_letter[15]: _out = out_letter[15];\n        in_letter[16]: _out = out_letter[16];\n        in_letter[17]: _out = out_letter[17];\n        in_letter[18]: _out = out_letter[18];\n        in_letter[19]: _out = out_letter[19];\n        in_letter[20]: _out = out_letter[20];\n        in_letter[21]: _out = out_letter[21];\n        in_letter[22]: _out = out_letter[22];\n        in_letter[23]: _out = out_letter[23];\n        in_letter[24]: _out = out_letter[24];\n        in_letter[25]: _out = out_letter[25];\n                \n        \" \": _out = \" \";\n        \n        default: _out = 8'b0000_0000;\n    endcase\nend\n\nassign letter_out = _out;",
+            "params": [],
+            "ports": {
+              "in": [
+                {
+                  "name": "letter",
+                  "range": "[7:0]",
+                  "size": 8
+                },
+                {
+                  "name": "mode"
+                }
+              ],
+              "out": [
+                {
+                  "name": "letter_out",
+                  "range": "[7:0]",
+                  "size": 8
+                }
+              ]
+            }
+          },
+          "position": {
+            "x": 616,
+            "y": -32
+          },
+          "size": {
+            "width": 632,
+            "height": 744
+          }
+        },
+        {
+          "id": "8da194b5-1ffb-4c3c-a47c-8a4fd2be7101",
+          "type": "basic.code",
+          "data": {
+            "code": "/*Caesar Cypher\n\nCreated by Julián Caro Linares\n\njcarolinares@gmail.com\n\n\"A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z.\"\n\n*/\n\n/*Example 1*/\n\nreg [7:0] alphabet [0:25];\nreg [7:0] in_letter [0:25]; // Input contacts, it changes depending of the mode\nreg [7:0] crypt [0:25]; // Encryption disc- To make a new disc, change the values of this memory\nreg [7:0] out_letter [0:25]; // Output contacs, it changes depending of the mode\n\nreg [7:0] _out;\ninteger i=0; //For loop integer counter\n\n\nalways @(*) begin\n\n//Alphabet/Symbols declaration and encrypted symbols\nalphabet[0]=\"a\";  crypt[0]=\"k\";\nalphabet[1]=\"b\";  crypt[1]=\"j\";\nalphabet[2]=\"c\";  crypt[2]=\"l\";\nalphabet[3]=\"d\";  crypt[3]=\"x\";\nalphabet[4]=\"e\";  crypt[4]=\"i\";\nalphabet[5]=\"f\";  crypt[5]=\"e\";\nalphabet[6]=\"g\";  crypt[6]=\"y\";\nalphabet[7]=\"h\";  crypt[7]=\"z\";\nalphabet[8]=\"i\";  crypt[8]=\"p\";\nalphabet[9]=\"j\";  crypt[9]=\"w\";\nalphabet[10]=\"k\"; crypt[10]=\"g\";\nalphabet[11]=\"l\"; crypt[11]=\"v\";\nalphabet[12]=\"m\"; crypt[12]=\"q\";\nalphabet[13]=\"n\"; crypt[13]=\"f\";\nalphabet[14]=\"o\"; crypt[14]=\"u\";\nalphabet[15]=\"p\"; crypt[15]=\"r\";\nalphabet[16]=\"q\"; crypt[16]=\"m\";\nalphabet[17]=\"r\"; crypt[17]=\"n\";\nalphabet[18]=\"s\"; crypt[18]=\"s\";\nalphabet[19]=\"t\"; crypt[19]=\"a\";\nalphabet[20]=\"u\"; crypt[20]=\"h\";\nalphabet[21]=\"v\"; crypt[21]=\"o\";\nalphabet[22]=\"w\"; crypt[22]=\"b\";\nalphabet[23]=\"x\"; crypt[23]=\"c\";\nalphabet[24]=\"y\"; crypt[24]=\"t\";\nalphabet[25]=\"z\"; crypt[25]=\"d\";\n\n\n//Position between Encrypted disc and external positions contacts.\nfor (i=0; i<26;i=i+1)\n    begin\n        if (mode==0) begin\n            in_letter[i]<=alphabet[i];\n            out_letter[i]<=crypt[i];\n        end\n        else begin\n            in_letter[i]<=crypt[i];\n            out_letter[i]<=alphabet[i];\n        end\n    end\n\n\n//Conection between contacts\n\n    case(letter)\n        in_letter[0]: _out = out_letter[0];\n        in_letter[1]: _out = out_letter[1];\n        in_letter[2]: _out = out_letter[2];\n        in_letter[3]: _out = out_letter[3];\n        in_letter[4]: _out = out_letter[4];\n        in_letter[5]: _out = out_letter[5];\n        in_letter[6]: _out = out_letter[6];\n        in_letter[7]: _out = out_letter[7];\n        in_letter[8]: _out = out_letter[8];\n        in_letter[9]: _out = out_letter[9];\n        in_letter[10]: _out = out_letter[10];\n        in_letter[11]: _out = out_letter[11];\n        in_letter[12]: _out = out_letter[12];\n        in_letter[13]: _out = out_letter[13];\n        in_letter[14]: _out = out_letter[14];\n        in_letter[15]: _out = out_letter[15];\n        in_letter[16]: _out = out_letter[16];\n        in_letter[17]: _out = out_letter[17];\n        in_letter[18]: _out = out_letter[18];\n        in_letter[19]: _out = out_letter[19];\n        in_letter[20]: _out = out_letter[20];\n        in_letter[21]: _out = out_letter[21];\n        in_letter[22]: _out = out_letter[22];\n        in_letter[23]: _out = out_letter[23];\n        in_letter[24]: _out = out_letter[24];\n        in_letter[25]: _out = out_letter[25];\n                \n        \" \": _out = \" \";\n        \n        default: _out = 8'b0000_0000;\n    endcase\nend\n\nassign letter_out = _out;",
+            "params": [],
+            "ports": {
+              "in": [
+                {
+                  "name": "letter",
+                  "range": "[7:0]",
+                  "size": 8
+                },
+                {
+                  "name": "mode"
+                }
+              ],
+              "out": [
+                {
+                  "name": "letter_out",
+                  "range": "[7:0]",
+                  "size": 8
+                }
+              ]
+            }
+          },
+          "position": {
+            "x": 1504,
+            "y": 160
+          },
+          "size": {
+            "width": 632,
+            "height": 744
           }
         }
       ],
@@ -336,17 +406,6 @@
         },
         {
           "source": {
-            "block": "48601cbd-ae23-4dad-9815-42c90ab1d7db",
-            "port": "letter_out"
-          },
-          "target": {
-            "block": "09b2c72f-4745-424f-9d74-647334648eaa",
-            "port": "27183891-b385-412b-bc55-21df1dd0280e"
-          },
-          "size": 8
-        },
-        {
-          "source": {
             "block": "4cb0ee46-ae09-49e4-8b1c-f4db93d43915",
             "port": "d7ebc6ce-2cde-4e33-8c9d-b439fd2cb3e0"
           },
@@ -356,8 +415,8 @@
           },
           "vertices": [
             {
-              "x": 208,
-              "y": 600
+              "x": 1776,
+              "y": 984
             }
           ]
         },
@@ -460,6 +519,65 @@
             "block": "f6088ff7-929b-4894-9607-8f75ca344796",
             "port": "in"
           }
+        },
+        {
+          "source": {
+            "block": "48601cbd-ae23-4dad-9815-42c90ab1d7db",
+            "port": "letter_out"
+          },
+          "target": {
+            "block": "2efd6c53-a8ce-424f-869e-ab1e9d75417c",
+            "port": "letter"
+          },
+          "size": 8
+        },
+        {
+          "source": {
+            "block": "b9defb7b-0029-4112-b62d-dc06ef2e90d3",
+            "port": "d588e866-08ee-43f6-b30b-1df27884333c"
+          },
+          "target": {
+            "block": "2efd6c53-a8ce-424f-869e-ab1e9d75417c",
+            "port": "mode"
+          }
+        },
+        {
+          "source": {
+            "block": "2efd6c53-a8ce-424f-869e-ab1e9d75417c",
+            "port": "letter_out"
+          },
+          "target": {
+            "block": "8da194b5-1ffb-4c3c-a47c-8a4fd2be7101",
+            "port": "letter"
+          },
+          "size": 8
+        },
+        {
+          "source": {
+            "block": "8da194b5-1ffb-4c3c-a47c-8a4fd2be7101",
+            "port": "letter_out"
+          },
+          "target": {
+            "block": "09b2c72f-4745-424f-9d74-647334648eaa",
+            "port": "27183891-b385-412b-bc55-21df1dd0280e"
+          },
+          "size": 8
+        },
+        {
+          "source": {
+            "block": "39ff41db-26b6-4c57-870e-d698d2b17b66",
+            "port": "out"
+          },
+          "target": {
+            "block": "8da194b5-1ffb-4c3c-a47c-8a4fd2be7101",
+            "port": "mode"
+          },
+          "vertices": [
+            {
+              "x": 280,
+              "y": 600
+            }
+          ]
         }
       ]
     }

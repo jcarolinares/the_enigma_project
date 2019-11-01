@@ -32,6 +32,61 @@
           }
         },
         {
+          "id": "75e5f67d-dda7-4b5e-8127-687e6af6ae03",
+          "type": "basic.output",
+          "data": {
+            "name": "LEDS",
+            "range": "[7:0]",
+            "pins": [
+              {
+                "index": "7",
+                "name": "LED7",
+                "value": "104"
+              },
+              {
+                "index": "6",
+                "name": "LED6",
+                "value": "102"
+              },
+              {
+                "index": "5",
+                "name": "LED5",
+                "value": "101"
+              },
+              {
+                "index": "4",
+                "name": "LED4",
+                "value": "99"
+              },
+              {
+                "index": "3",
+                "name": "LED3",
+                "value": "98"
+              },
+              {
+                "index": "2",
+                "name": "LED2",
+                "value": "97"
+              },
+              {
+                "index": "1",
+                "name": "LED1",
+                "value": "96"
+              },
+              {
+                "index": "0",
+                "name": "LED0",
+                "value": "95"
+              }
+            ],
+            "virtual": false
+          },
+          "position": {
+            "x": 632,
+            "y": -280
+          }
+        },
+        {
           "id": "9138f647-cc36-499f-9a51-fa7ae9af67d6",
           "type": "basic.output",
           "data": {
@@ -51,175 +106,35 @@
           }
         },
         {
-          "id": "39ff41db-26b6-4c57-870e-d698d2b17b66",
-          "type": "basic.input",
+          "id": "48601cbd-ae23-4dad-9815-42c90ab1d7db",
+          "type": "basic.code",
           "data": {
-            "name": "mode",
-            "pins": [
-              {
-                "index": "0",
-                "name": "SW1",
-                "value": "10"
-              }
-            ],
-            "virtual": false,
-            "clock": false
+            "code": "/*Caesar Cypher\n\nCreated by Julián Caro Linares\n\njcarolinares@gmail.com\n\n\"A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z.\"\n\n*/\n\n/*Example 1*/\n\nreg [7:0] alphabet [0:25];\nreg [7:0] in_letter [0:25]; // Input contacts, it changes depending of the mode\nreg [7:0] crypt [0:25]; // Encryption disc- To make a new disc, change the values of this memory\nreg [7:0] out_letter [0:25]; // Output contacs, it changes depending of the mode\n\nreg [7:0] _out;\ninteger i=0; //For loop integer counter\n\n\nalways @(*) begin\n\n//Alphabet/Symbols declaration and encrypted symbols\nalphabet[0]=\"a\";  crypt[0]=\"b\";\nalphabet[1]=\"b\";  crypt[1]=\"c\";\nalphabet[2]=\"c\";  crypt[2]=\"d\";\nalphabet[3]=\"d\";  crypt[3]=\"e\";\nalphabet[4]=\"e\";  crypt[4]=\"f\";\nalphabet[5]=\"f\";  crypt[5]=\"g\";\nalphabet[6]=\"g\";  crypt[6]=\"h\";\nalphabet[7]=\"h\";  crypt[7]=\"i\";\nalphabet[8]=\"i\";  crypt[8]=\"j\";\nalphabet[9]=\"j\";  crypt[9]=\"k\";\nalphabet[10]=\"k\"; crypt[10]=\"l\";\nalphabet[11]=\"l\"; crypt[11]=\"m\";\nalphabet[12]=\"m\"; crypt[12]=\"n\";\nalphabet[13]=\"n\"; crypt[13]=\"o\";\nalphabet[14]=\"o\"; crypt[14]=\"p\";\nalphabet[15]=\"p\"; crypt[15]=\"q\";\nalphabet[16]=\"q\"; crypt[16]=\"r\";\nalphabet[17]=\"r\"; crypt[17]=\"s\";\nalphabet[18]=\"s\"; crypt[18]=\"t\";\nalphabet[19]=\"t\"; crypt[19]=\"u\";\nalphabet[20]=\"u\"; crypt[20]=\"v\";\nalphabet[21]=\"v\"; crypt[21]=\"w\";\nalphabet[22]=\"w\"; crypt[22]=\"x\";\nalphabet[23]=\"x\"; crypt[23]=\"y\";\nalphabet[24]=\"y\"; crypt[24]=\"z\";\nalphabet[25]=\"z\"; crypt[25]=\"a\";\n\n//Position between Encrypted disc and external positions contacts.\nfor (i=0; i<26;i=i+1)\n    begin\n        in_letter[i]<=crypt[i];\n        out_letter[i]<=alphabet[i];\n    end\n\n\n//Conection between contacts\n\n    case(letter)\n        in_letter[0]: _out = out_letter[0];\n        in_letter[1]: _out = out_letter[1];\n        in_letter[2]: _out = out_letter[2];\n        in_letter[3]: _out = out_letter[3];\n        in_letter[4]: _out = out_letter[4];\n        in_letter[5]: _out = out_letter[5];\n        in_letter[6]: _out = out_letter[6];\n        in_letter[7]: _out = out_letter[7];\n        in_letter[8]: _out = out_letter[8];\n        in_letter[9]: _out = out_letter[9];\n        in_letter[10]: _out = out_letter[10];\n        in_letter[11]: _out = out_letter[11];\n        in_letter[12]: _out = out_letter[12];\n        in_letter[13]: _out = out_letter[13];\n        in_letter[14]: _out = out_letter[14];\n        in_letter[15]: _out = out_letter[15];\n        in_letter[16]: _out = out_letter[16];\n        in_letter[17]: _out = out_letter[17];\n        in_letter[18]: _out = out_letter[18];\n        in_letter[19]: _out = out_letter[19];\n        in_letter[20]: _out = out_letter[20];\n        in_letter[21]: _out = out_letter[21];\n        in_letter[22]: _out = out_letter[22];\n        in_letter[23]: _out = out_letter[23];\n        in_letter[24]: _out = out_letter[24];\n        in_letter[25]: _out = out_letter[25];\n                \n        \" \": _out = \" \";\n        \n        default: _out = 8'b0000_0000;\n    endcase\nend\n\nassign letter_out = _out;",
+            "params": [],
+            "ports": {
+              "in": [
+                {
+                  "name": "letter",
+                  "range": "[7:0]",
+                  "size": 8
+                }
+              ],
+              "out": [
+                {
+                  "name": "letter_out",
+                  "range": "[7:0]",
+                  "size": 8
+                }
+              ]
+            }
           },
           "position": {
-            "x": -608,
-            "y": 320
-          }
-        },
-        {
-          "id": "767d6031-2b52-4236-9f09-f2d5dae59465",
-          "type": "basic.output",
-          "data": {
-            "name": "mode_led",
-            "pins": [
-              {
-                "index": "0",
-                "name": "LED0",
-                "value": "95"
-              }
-            ],
-            "virtual": false
+            "x": -272,
+            "y": -224
           },
-          "position": {
-            "x": -296,
-            "y": 648
-          }
-        },
-        {
-          "id": "3c70745f-ff1e-4530-a641-d2a8bc456d62",
-          "type": "basic.output",
-          "data": {
-            "name": "mode_led",
-            "pins": [
-              {
-                "index": "0",
-                "name": "LED3",
-                "value": "98"
-              }
-            ],
-            "virtual": false
-          },
-          "position": {
-            "x": 0,
-            "y": 648
-          }
-        },
-        {
-          "id": "159782b1-53cb-4154-8725-b65c4e217339",
-          "type": "basic.output",
-          "data": {
-            "name": "mode_led",
-            "pins": [
-              {
-                "index": "0",
-                "name": "LED6",
-                "value": "102"
-              }
-            ],
-            "virtual": false
-          },
-          "position": {
-            "x": -144,
-            "y": 648
-          }
-        },
-        {
-          "id": "21030ec2-9557-435f-b87f-07c987a9da8e",
-          "type": "basic.output",
-          "data": {
-            "name": "mode_led",
-            "pins": [
-              {
-                "index": "0",
-                "name": "LED1",
-                "value": "96"
-              }
-            ],
-            "virtual": false
-          },
-          "position": {
-            "x": -296,
-            "y": 728
-          }
-        },
-        {
-          "id": "2a05158b-4e93-42cc-a95f-3156a5e91ac5",
-          "type": "basic.output",
-          "data": {
-            "name": "mode_led",
-            "pins": [
-              {
-                "index": "0",
-                "name": "LED4",
-                "value": "99"
-              }
-            ],
-            "virtual": false
-          },
-          "position": {
-            "x": 0,
-            "y": 728
-          }
-        },
-        {
-          "id": "1e536a14-85f4-4369-bbdc-07a83192f5aa",
-          "type": "basic.output",
-          "data": {
-            "name": "mode_led",
-            "pins": [
-              {
-                "index": "0",
-                "name": "LED7",
-                "value": "104"
-              }
-            ],
-            "virtual": false
-          },
-          "position": {
-            "x": -144,
-            "y": 728
-          }
-        },
-        {
-          "id": "c5223cac-0863-41da-a072-44685b679dbb",
-          "type": "basic.output",
-          "data": {
-            "name": "mode_led",
-            "pins": [
-              {
-                "index": "0",
-                "name": "LED2",
-                "value": "97"
-              }
-            ],
-            "virtual": false
-          },
-          "position": {
-            "x": -296,
-            "y": 808
-          }
-        },
-        {
-          "id": "f6088ff7-929b-4894-9607-8f75ca344796",
-          "type": "basic.output",
-          "data": {
-            "name": "mode_led",
-            "pins": [
-              {
-                "index": "0",
-                "name": "LED5",
-                "value": "101"
-              }
-            ],
-            "virtual": false
-          },
-          "position": {
-            "x": 0,
-            "y": 808
+          "size": {
+            "width": 632,
+            "height": 744
           }
         },
         {
@@ -245,53 +160,6 @@
             "width": 96,
             "height": 96
           }
-        },
-        {
-          "id": "48601cbd-ae23-4dad-9815-42c90ab1d7db",
-          "type": "basic.code",
-          "data": {
-            "code": "/* Enigma machine one rotor\n\nCreated by Julián Caro Linares\n\njcarolinares@gmail.com\n\n\"A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z.\"\n\n*/\n\n/*Example 1*/\n\nreg [7:0] alphabet [0:25];\nreg [7:0] in_letter [0:25]; // Input contacts, it changes depending of the mode\nreg [7:0] crypt [0:25]; // Encryption disc- To make a new disc, change the values of this memory\nreg [7:0] out_letter [0:25]; // Output contacs, it changes depending of the mode\n\nreg [7:0] _out;\ninteger i=0; //For loop integer counter\n\n\nalways @(*) begin\n\n//Alphabet/Symbols declaration and encrypted symbols\nalphabet[0]=\"a\";  crypt[0]=\"j\";\nalphabet[1]=\"b\";  crypt[1]=\"k\";\nalphabet[2]=\"c\";  crypt[2]=\"q\";\nalphabet[3]=\"d\";  crypt[3]=\"u\";\nalphabet[4]=\"e\";  crypt[4]=\"l\";\nalphabet[5]=\"f\";  crypt[5]=\"m\";\nalphabet[6]=\"g\";  crypt[6]=\"r\";\nalphabet[7]=\"h\";  crypt[7]=\"t\";\nalphabet[8]=\"i\";  crypt[8]=\"b\";\nalphabet[9]=\"j\";  crypt[9]=\"a\";\nalphabet[10]=\"k\"; crypt[10]=\"s\";\nalphabet[11]=\"l\"; crypt[11]=\"d\";\nalphabet[12]=\"m\"; crypt[12]=\"c\";\nalphabet[13]=\"n\"; crypt[13]=\"o\";\nalphabet[14]=\"o\"; crypt[14]=\"v\";\nalphabet[15]=\"p\"; crypt[15]=\"p\";\nalphabet[16]=\"q\"; crypt[16]=\"n\";\nalphabet[17]=\"r\"; crypt[17]=\"w\";\nalphabet[18]=\"s\"; crypt[18]=\"e\";\nalphabet[19]=\"t\"; crypt[19]=\"x\";\nalphabet[20]=\"u\"; crypt[20]=\"z\";\nalphabet[21]=\"v\"; crypt[21]=\"y\";\nalphabet[22]=\"w\"; crypt[22]=\"f\";\nalphabet[23]=\"x\"; crypt[23]=\"i\";\nalphabet[24]=\"y\"; crypt[24]=\"h\";\nalphabet[25]=\"z\"; crypt[25]=\"g\";\n\n\n//Position between Encrypted disc and external positions contacts.\nfor (i=0; i<26;i=i+1)\n    begin\n        if (mode==0) begin\n            in_letter[i]<=alphabet[i];\n            out_letter[i]<=crypt[i];\n        end\n        else begin\n            in_letter[i]<=crypt[i];\n            out_letter[i]<=alphabet[i];\n        end\n    end\n\n\n//Conection between contacts\n\n    case(letter)\n        in_letter[0]: _out = out_letter[0];\n        in_letter[1]: _out = out_letter[1];\n        in_letter[2]: _out = out_letter[2];\n        in_letter[3]: _out = out_letter[3];\n        in_letter[4]: _out = out_letter[4];\n        in_letter[5]: _out = out_letter[5];\n        in_letter[6]: _out = out_letter[6];\n        in_letter[7]: _out = out_letter[7];\n        in_letter[8]: _out = out_letter[8];\n        in_letter[9]: _out = out_letter[9];\n        in_letter[10]: _out = out_letter[10];\n        in_letter[11]: _out = out_letter[11];\n        in_letter[12]: _out = out_letter[12];\n        in_letter[13]: _out = out_letter[13];\n        in_letter[14]: _out = out_letter[14];\n        in_letter[15]: _out = out_letter[15];\n        in_letter[16]: _out = out_letter[16];\n        in_letter[17]: _out = out_letter[17];\n        in_letter[18]: _out = out_letter[18];\n        in_letter[19]: _out = out_letter[19];\n        in_letter[20]: _out = out_letter[20];\n        in_letter[21]: _out = out_letter[21];\n        in_letter[22]: _out = out_letter[22];\n        in_letter[23]: _out = out_letter[23];\n        in_letter[24]: _out = out_letter[24];\n        in_letter[25]: _out = out_letter[25];\n                \n        \" \": _out = \" \";\n        \n        default: _out = 8'b0000_0000;\n    endcase\nend\n\nassign letter_out = _out;",
-            "params": [],
-            "ports": {
-              "in": [
-                {
-                  "name": "letter",
-                  "range": "[7:0]",
-                  "size": 8
-                },
-                {
-                  "name": "mode"
-                }
-              ],
-              "out": [
-                {
-                  "name": "letter_out",
-                  "range": "[7:0]",
-                  "size": 8
-                }
-              ]
-            }
-          },
-          "position": {
-            "x": -272,
-            "y": -224
-          },
-          "size": {
-            "width": 632,
-            "height": 744
-          }
-        },
-        {
-          "id": "b9defb7b-0029-4112-b62d-dc06ef2e90d3",
-          "type": "898c883b6b630622eaf08e5a3c5ef8b417a962e7",
-          "position": {
-            "x": -456,
-            "y": 304
-          },
-          "size": {
-            "width": 96,
-            "height": 64
-          }
         }
       ],
       "wires": [
@@ -316,6 +184,17 @@
             "port": "in"
           },
           "vertices": []
+        },
+        {
+          "source": {
+            "block": "48601cbd-ae23-4dad-9815-42c90ab1d7db",
+            "port": "letter_out"
+          },
+          "target": {
+            "block": "75e5f67d-dda7-4b5e-8127-687e6af6ae03",
+            "port": "in"
+          },
+          "size": 8
         },
         {
           "source": {
@@ -360,106 +239,6 @@
               "y": 600
             }
           ]
-        },
-        {
-          "source": {
-            "block": "39ff41db-26b6-4c57-870e-d698d2b17b66",
-            "port": "out"
-          },
-          "target": {
-            "block": "b9defb7b-0029-4112-b62d-dc06ef2e90d3",
-            "port": "1dce7109-e23a-42b6-a62c-d89c6fb0679e"
-          }
-        },
-        {
-          "source": {
-            "block": "b9defb7b-0029-4112-b62d-dc06ef2e90d3",
-            "port": "d588e866-08ee-43f6-b30b-1df27884333c"
-          },
-          "target": {
-            "block": "48601cbd-ae23-4dad-9815-42c90ab1d7db",
-            "port": "mode"
-          }
-        },
-        {
-          "source": {
-            "block": "b9defb7b-0029-4112-b62d-dc06ef2e90d3",
-            "port": "d588e866-08ee-43f6-b30b-1df27884333c"
-          },
-          "target": {
-            "block": "767d6031-2b52-4236-9f09-f2d5dae59465",
-            "port": "in"
-          }
-        },
-        {
-          "source": {
-            "block": "b9defb7b-0029-4112-b62d-dc06ef2e90d3",
-            "port": "d588e866-08ee-43f6-b30b-1df27884333c"
-          },
-          "target": {
-            "block": "21030ec2-9557-435f-b87f-07c987a9da8e",
-            "port": "in"
-          }
-        },
-        {
-          "source": {
-            "block": "b9defb7b-0029-4112-b62d-dc06ef2e90d3",
-            "port": "d588e866-08ee-43f6-b30b-1df27884333c"
-          },
-          "target": {
-            "block": "c5223cac-0863-41da-a072-44685b679dbb",
-            "port": "in"
-          }
-        },
-        {
-          "source": {
-            "block": "b9defb7b-0029-4112-b62d-dc06ef2e90d3",
-            "port": "d588e866-08ee-43f6-b30b-1df27884333c"
-          },
-          "target": {
-            "block": "159782b1-53cb-4154-8725-b65c4e217339",
-            "port": "in"
-          }
-        },
-        {
-          "source": {
-            "block": "b9defb7b-0029-4112-b62d-dc06ef2e90d3",
-            "port": "d588e866-08ee-43f6-b30b-1df27884333c"
-          },
-          "target": {
-            "block": "1e536a14-85f4-4369-bbdc-07a83192f5aa",
-            "port": "in"
-          }
-        },
-        {
-          "source": {
-            "block": "b9defb7b-0029-4112-b62d-dc06ef2e90d3",
-            "port": "d588e866-08ee-43f6-b30b-1df27884333c"
-          },
-          "target": {
-            "block": "3c70745f-ff1e-4530-a641-d2a8bc456d62",
-            "port": "in"
-          }
-        },
-        {
-          "source": {
-            "block": "b9defb7b-0029-4112-b62d-dc06ef2e90d3",
-            "port": "d588e866-08ee-43f6-b30b-1df27884333c"
-          },
-          "target": {
-            "block": "2a05158b-4e93-42cc-a95f-3156a5e91ac5",
-            "port": "in"
-          }
-        },
-        {
-          "source": {
-            "block": "b9defb7b-0029-4112-b62d-dc06ef2e90d3",
-            "port": "d588e866-08ee-43f6-b30b-1df27884333c"
-          },
-          "target": {
-            "block": "f6088ff7-929b-4894-9607-8f75ca344796",
-            "port": "in"
-          }
         }
       ]
     }
@@ -870,164 +649,6 @@
               "target": {
                 "block": "42306dfc-8702-4c9a-98d6-56b4c86fff21",
                 "port": "in"
-              }
-            }
-          ]
-        }
-      }
-    },
-    "898c883b6b630622eaf08e5a3c5ef8b417a962e7": {
-      "package": {
-        "name": "Pulsador-cambio",
-        "version": "0.1",
-        "description": "Pulsador de cambio. Cada vez que se aprieta cambia de estado",
-        "author": "Juan Gonzalez-Gomez (Obijuan)",
-        "image": "%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20xmlns:xlink=%22http://www.w3.org/1999/xlink%22%20width=%22460.337%22%20height=%22255.947%22%20viewBox=%220%200%20121.79741%2067.719391%22%3E%3Cdefs%3E%3ClinearGradient%20gradientTransform=%22matrix(-.013%20-.01966%20.01932%20-.01493%20151.654%20290.082)%22%20gradientUnits=%22userSpaceOnUse%22%20y2=%222300.215%22%20x2=%226069.057%22%20y1=%222538.05%22%20x1=%225466.681%22%20id=%22b%22%20xlink:href=%22#a%22/%3E%3ClinearGradient%20id=%22a%22%3E%3Cstop%20offset=%220%22%20stop-color=%22#c3875c%22/%3E%3Cstop%20offset=%22.48%22%20stop-color=%22#eccba3%22/%3E%3Cstop%20offset=%221%22%20stop-color=%22#fce0cb%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Cg%20transform=%22translate(138.022%20-134.888)%22%3E%3Cpath%20d=%22M-117.19%20184.278a20.69%209.094%200%200%200-13.734%202.307l-5.434.006-1.284%205.482a20.69%209.094%200%200%200-.238%201.3%2020.69%209.094%200%200%200%2020.69%209.093%2020.69%209.094%200%200%200%2020.69-9.094%2020.69%209.094%200%200%200-.029-.351h.064l-1.277-6.47-5.778.005a20.69%209.094%200%200%200-13.67-2.278z%22%20fill=%22#333%22%20stroke=%22#000%22%20stroke-width=%22.282%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22/%3E%3Cellipse%20ry=%226.762%22%20rx=%2219.408%22%20cy=%22187.341%22%20cx=%22-117.074%22%20fill=%22#666%22%20stroke=%22#000%22%20stroke-width=%22.282%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22/%3E%3Cg%20transform=%22matrix(.1018%200%200%20.10181%20-158.528%20145.536)%22%20stroke=%22#000%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%20stroke-width=%222.772%22%3E%3Cellipse%20cx=%22406.087%22%20cy=%22399.216%22%20rx=%22184.221%22%20ry=%2272.858%22%20fill=%22green%22/%3E%3Cellipse%20cx=%22406.23%22%20cy=%22383.328%22%20rx=%22179.497%22%20ry=%2260.977%22%20fill=%22#0f0%22/%3E%3C/g%3E%3C/g%3E%3Cpath%20d=%22M126.16%20115.387c-1.523%201.514-2.14%203.307-2.023%205.326-.507%201.097-2.411%202.346-2.027%203.267-1.196%201.923-1.624%203.389-1.572%204.569-.544%201.24-.403%201.705-.348%202.268-2.266%203.497-4.092%208.255-5.878%2013.125-2.302%202.765-3.64%205.792-4.898%208.84-2.191%203.7-3.756%207.67-4.02%2011.394l-.265.558c2.996%203.107%204.946%201.524%207.018.747%206.637-3.112%209.504-8.52%2012.212-14.025.473-1.572%201.57-3.127%203.151-4.669%204.414-4.785%206.886-10.022%209.857-15.142.228-.428.58-1.032%201.143-1.941%201.675-1.795%203.418-4.997%205.132-7.612z%22%20fill=%22url(#b)%22%20fill-rule=%22evenodd%22%20stroke=%22#000%22%20stroke-width=%22.265%22%20transform=%22translate(-90.276%20-115.233)%22/%3E%3Cpath%20d=%22M18.486%2038.911c-2.362%202.823-3.506%206.298-4.228%2010.204.518.13%201.302-.444%202.155-1.196%202.575-6.067%201.848-7.142%202.073-9.008z%22%20fill=%22#f8ecf8%22%20fill-rule=%22evenodd%22%20stroke=%22#000%22%20stroke-width=%22.265%22/%3E%3Cpath%20d=%22M33.79%205.666c2.093-.057%203.853.53%205.373%201.582M31.832%208.759c2.001.286%203.946.663%205.428%201.788M30.331%2013.16c1.325-.48%203.02.099%204.83%201.005M29.98%2015.593l1.79.362%22%20fill=%22none%22%20stroke=%22#000%22%20stroke-width=%22.265%22/%3E%3Ctext%20style=%22line-height:1.25;-inkscape-font-specification:ubuntu%22%20x=%2295.623%22%20y=%22119.34%22%20font-weight=%22400%22%20font-size=%2232.213%22%20font-family=%22ubuntu%22%20letter-spacing=%220%22%20word-spacing=%220%22%20stroke-width=%222.013%22%20transform=%22translate(-45.776%20-83.714)%22%3E%3Ctspan%20x=%2295.623%22%20y=%22119.34%22%20style=%22-inkscape-font-specification:'ubuntu%20Medium'%22%20font-weight=%22500%22%3E1%3C/tspan%3E%3C/text%3E%3Cpath%20d=%22M111.077%2010.046l6.423-6.173-.75%2020.27-19.855-.75%206.09-6.006s-4.671-4.922-12.93-5.005c-8.259-.084-13.264%204.588-13.264%204.588l.084-6.84-5.173-2.253s8.092-6.34%2018.853-5.84c10.762.5%2020.522%208.009%2020.522%208.009zM67.44%2056.694l-6.424%206.173.75-20.271%2019.855.75-6.09%206.007s4.672%204.921%2012.93%205.005c8.259.083%2013.264-4.588%2013.264-4.588l-.083%206.84%205.172%202.253s-8.092%206.34-18.853%205.84c-10.761-.501-20.522-8.01-20.522-8.01z%22%20fill=%22green%22%20stroke=%22#000%22%20stroke-width=%22.529%22/%3E%3Ctext%20style=%22line-height:1.25;-inkscape-font-specification:ubuntu%22%20x=%22150.662%22%20y=%22135.941%22%20font-weight=%22400%22%20font-size=%2232.213%22%20font-family=%22ubuntu%22%20letter-spacing=%220%22%20word-spacing=%220%22%20stroke-width=%222.013%22%20transform=%22translate(-45.776%20-83.714)%22%3E%3Ctspan%20x=%22150.662%22%20y=%22135.941%22%20style=%22-inkscape-font-specification:'ubuntu%20Medium'%22%20font-weight=%22500%22%3E0%3C/tspan%3E%3C/text%3E%3C/svg%3E"
-      },
-      "design": {
-        "graph": {
-          "blocks": [
-            {
-              "id": "26db5867-23b2-4ada-869b-9cb39b23c299",
-              "type": "basic.input",
-              "data": {
-                "name": "",
-                "clock": true
-              },
-              "position": {
-                "x": 40,
-                "y": 192
-              }
-            },
-            {
-              "id": "d588e866-08ee-43f6-b30b-1df27884333c",
-              "type": "basic.output",
-              "data": {
-                "name": ""
-              },
-              "position": {
-                "x": 784,
-                "y": 360
-              }
-            },
-            {
-              "id": "1dce7109-e23a-42b6-a62c-d89c6fb0679e",
-              "type": "basic.input",
-              "data": {
-                "name": "pin",
-                "clock": false
-              },
-              "position": {
-                "x": 56,
-                "y": 536
-              }
-            },
-            {
-              "id": "524efa31-7f36-40e7-a3a7-6f8bf292a17f",
-              "type": "basic.constant",
-              "data": {
-                "name": "",
-                "value": "0",
-                "local": false
-              },
-              "position": {
-                "x": 408,
-                "y": -64
-              }
-            },
-            {
-              "id": "1026fd5a-6d94-4b04-9605-f283a770e98f",
-              "type": "basic.code",
-              "data": {
-                "code": "// Sincronizacion. Evitar \n// problema de la metaestabilidad\n\nreg d2;\nreg r_in;\n\nalways @(posedge clk)\n d2 <= d;\n \nalways @(posedge clk)\n  r_in <= d2;\n\n\n//-- Debouncer Circuit\n//-- It produces a stable output when the\n//-- input signal is bouncing\n\nreg btn_prev = 0;\nreg btn_out_r = 0;\n\nreg [16:0] counter = 0;\n\n\nalways @(posedge clk) begin\n\n  //-- If btn_prev and btn_in are differents\n  if (btn_prev ^ r_in == 1'b1) begin\n    \n      //-- Reset the counter\n      counter <= 0;\n      \n      //-- Capture the button status\n      btn_prev <= r_in;\n  end\n    \n  //-- If no timeout, increase the counter\n  else if (counter[16] == 1'b0)\n      counter <= counter + 1;\n      \n  else\n    //-- Set the output to the stable value\n    btn_out_r <= btn_prev;\n\nend\n\n\n//-- Generar tic en flanco de subida del boton\nreg old;\nwire tic;\n\nalways @(posedge clk)\n  old <= btn_out_r;\n  \nassign tic = !old & btn_out_r;\n\n//-- Conectar a un biestable de tipo T\nreg q = INI;\n\nalways @(posedge clk)\n  if (tic)\n    q <= ~q;\n\n//-- Sacar el estado del biestable por la salida\nassign tb = q;\n\n\n\n",
-                "params": [
-                  {
-                    "name": "INI"
-                  }
-                ],
-                "ports": {
-                  "in": [
-                    {
-                      "name": "clk"
-                    },
-                    {
-                      "name": "d"
-                    }
-                  ],
-                  "out": [
-                    {
-                      "name": "tb"
-                    }
-                  ]
-                }
-              },
-              "position": {
-                "x": 224,
-                "y": 48
-              },
-              "size": {
-                "width": 456,
-                "height": 688
-              }
-            },
-            {
-              "id": "2b0cb5ea-6a20-46c1-bdb5-dbc79e918f41",
-              "type": "basic.info",
-              "data": {
-                "info": "Valor inicial del pulsador\n",
-                "readonly": true
-              },
-              "position": {
-                "x": 376,
-                "y": -72
-              },
-              "size": {
-                "width": 224,
-                "height": 40
-              }
-            }
-          ],
-          "wires": [
-            {
-              "source": {
-                "block": "1dce7109-e23a-42b6-a62c-d89c6fb0679e",
-                "port": "out"
-              },
-              "target": {
-                "block": "1026fd5a-6d94-4b04-9605-f283a770e98f",
-                "port": "d"
-              },
-              "vertices": []
-            },
-            {
-              "source": {
-                "block": "26db5867-23b2-4ada-869b-9cb39b23c299",
-                "port": "out"
-              },
-              "target": {
-                "block": "1026fd5a-6d94-4b04-9605-f283a770e98f",
-                "port": "clk"
-              },
-              "vertices": []
-            },
-            {
-              "source": {
-                "block": "1026fd5a-6d94-4b04-9605-f283a770e98f",
-                "port": "tb"
-              },
-              "target": {
-                "block": "d588e866-08ee-43f6-b30b-1df27884333c",
-                "port": "in"
-              }
-            },
-            {
-              "source": {
-                "block": "524efa31-7f36-40e7-a3a7-6f8bf292a17f",
-                "port": "constant-out"
-              },
-              "target": {
-                "block": "1026fd5a-6d94-4b04-9605-f283a770e98f",
-                "port": "INI"
               }
             }
           ]
